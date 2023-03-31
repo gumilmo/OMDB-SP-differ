@@ -112,71 +112,75 @@ class Differ {
     Source: ComparableDocument;
     Dest: ComparableDocument;
 
-    public diff(): ViewableLine[] {
-        const diff: ViewableLine[] = []
+    public getViewableLines(): ViewableLine[] {
+        const viewableLines: ViewableLine[] = []
 
         this.backTraking().forEach( (arr, arrindex) => {
 
-            const prevX = arr[0][0];
-            const prevY = arr[0][1];
-            const x = arr[1][0];
-            const y = arr[1][1];
+            const prevXPoint = arr[0][0];
+            const prevYPoint = arr[0][1];
+            const curXPoint = arr[1][0];
+            const curYPoint = arr[1][1];
 
 
-            const sourceLine = this.Source.Lines[prevX];
-            const destLine = this.Dest.Lines[prevY];
+            const sourceLine = this.Source.Lines[prevXPoint];
+            const destLine = this.Dest.Lines[prevYPoint];
 
-            if (prevX == x) {
-                diff.push(new ViewableLine("inserted", null, destLine));
+            if (prevXPoint == curXPoint) {
+                viewableLines.push(new ViewableLine("inserted", null, destLine));
             }
-            else if ( prevY == y) {
-                diff.push(new ViewableLine("deleted", sourceLine, null));
+            else if ( prevYPoint == curYPoint) {
+                viewableLines.push(new ViewableLine("deleted", sourceLine, null));
             }
             else {
-                diff.push(new ViewableLine("equals", destLine, destLine));
+                viewableLines.push(new ViewableLine("equals", destLine, destLine));
             }
 
         });
 
-        return diff;
+        return viewableLines;
     }
 
-    private shortestEdit() : Array<number[]> {
-        const n = this.Source.Lines.length;
-        const m = this.Dest.Lines.length;
+    //Ищем самый короткий путь от точки (0,0) до точки (n, m), где n - кол-во строк sourc'а, m - кол-во строк dest'а
+    private findShortestTrace() : Array<number[]> {
+        const sourceLength = this.Source.Lines.length;
+        const destLength = this.Dest.Lines.length;
 
-        const max = n + m;
+        const max = sourceLength + destLength;
 
-        const v: number[] = [];
+        const latestXValuesArray: number[] = [];
 
-        v[1] = 0;
+        latestXValuesArray[1] = 0;
         let backTracking: Array<number[]> = new Array ;
 
-        for (let d = 0; d <= max; d++) {
+        for (let depth = 0; depth <= max; depth++) {
 
-            backTracking.push(Object.assign({}, v));
+            //сохраняем значения, для пути назад, в котором можно будет отследить изменения 
+            backTracking.push(Object.assign({}, latestXValuesArray));
 
-            for (let k = -d; k <= d; k +=2) {
+            //k - шаг, через d, где d - кол-во шагов по графу в глубь
+            for (let k = -depth; k <= depth; k +=2) {
 
                 let x: number, y: number;
 
-                if (k === -d || (k !== d && v[k-1] < v[k+1])) {
-                    x = v[k+1];
+                if (k == -depth || (k != depth && latestXValuesArray[k-1] < latestXValuesArray[k+1])) {
+                    x = latestXValuesArray[k+1];
                 }
                 else {
-                    x = v[k-1] + 1;
+                    x = latestXValuesArray[k-1] + 1;
                 }
 
                 y = x - k;
 
-                while( x < n && y < m && this.Source.Lines[x].LineValue === this.Dest.Lines[y].LineValue) {
+                while( x < sourceLength && y < destLength && 
+                    this.Source.Lines[x].LineValue === this.Dest.Lines[y].LineValue) {
                     x++;
                     y++;
                 }
                 
-                v[k] = x
+                latestXValuesArray[k] = x
 
-                if (x >= n && y >= m) {
+                if (x >= sourceLength && y >= destLength) {
                     return backTracking;
                 }
             }
@@ -185,28 +189,36 @@ class Differ {
         return [];
     }
 
+    // Проходимся по полученному пути обратно, чтобы получить пары координат
+    // с помощью которых можно будет отследить изменения в файле 
+    // Если x из пердыдушей пары не равен x из текущей, то строка удалена
+    // Если y из пердыдушей пары не равен y из текущей, то строка добавлена
+    // Если x из пердыдушей пары равен x из текущей, то строка одинакова
+
     private backTraking(): Array<Array<number[]>> {
         let x = this.Source.Lines.length;
         let y = this.Dest.Lines.length;
 
         const backTracePairsArray: Array<Array<number[]>> = [];
 
-        this.shortestEdit().reverse().forEach( (v, d) => {
-            const vArray = Object.values(v);
+        const pointsInTrace = this.findShortestTrace().reverse();
+
+        pointsInTrace.forEach( (latestXValueArray, depth) => {
             const k = x - y;
+            const newIndex = pointsInTrace.length - 1 - depth;
 
             let prevX, prevY, prevK;
 
-            if (k == -d || (k != d && vArray[k-1] < vArray[k+1])) {
+            if (k == -newIndex || (k != newIndex && latestXValueArray[k-1] < latestXValueArray[k+1])) {
                 prevK = k + 1
             }
             else {
                 prevK = k - 1;
             }
 
-            prevX = vArray[prevK];
+            prevX = latestXValueArray[prevK];
 
-            if (Object.keys(v).length == 1) {
+            if (Object.keys(latestXValueArray).length == 1) {
                 if (prevK == -1) {
                     prevX = 0;
                 }
@@ -215,14 +227,12 @@ class Differ {
             prevY = prevX - prevK;
 
             while (x > prevX && y > prevY) {
-                if (prevX != undefined || prevY != undefined) {
-                    backTracePairsArray.push(new Array<number[]> ([x-1, y-1], [x,y]))
-                }
+                backTracePairsArray.push(new Array<number[]> ([x-1, y-1], [x,y]))
                 x--;
                 y--;
             }
 
-            if (d > 0) {
+            if (newIndex > 0) {
                 backTracePairsArray.push(new Array<number[]> ([prevX, prevY], [x,y]))
             }
 
@@ -230,7 +240,6 @@ class Differ {
             y = prevY;
         } );
 
-        backTracePairsArray.pop()
         return backTracePairsArray
     }
 
@@ -251,7 +260,7 @@ const dest: ComparableDocument = new ComparableDocument(
 const test = new Differ(source, dest);
 const printer = new ConsolePrinter();
 
-printer.print(test.diff());
+printer.print(test.getViewableLines());
 
 
 
