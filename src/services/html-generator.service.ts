@@ -117,7 +117,7 @@ export class HtmlGeneratorService {
             .viewable-row {
               display: flex;
               width: 100%;
-              max-width: 10000%;
+              overflow-wrap: anywhere
             }
 
             .str-num {
@@ -125,7 +125,8 @@ export class HtmlGeneratorService {
             }
 
             ol {
-              padding-inline-start: 0px
+              padding-inline-start: 0px;
+              margin-block-start: 0;
             }
 
             li {
