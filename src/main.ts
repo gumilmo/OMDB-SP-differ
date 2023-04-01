@@ -6,7 +6,7 @@ import { ComparableDocument } from './models/comparable-document.model';
 import { Line } from './models/line.model';
 import { ViewableLine } from './models/viewable-line.model';
 import { ConsolePrinter } from './services/console-printer.service';
-import { Differ } from './services/differ';
+import { Differ } from './services/differ.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
 
 var timeAppStart = new Date().getTime();
@@ -24,17 +24,17 @@ if (options == null) {
 }
 
 const source: ComparableDocument = new ComparableDocument(
-    loadFile("D://OMDB-SP-differ/test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    loadFile("././test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
 )
 
 const dest: ComparableDocument = new ComparableDocument(
-    loadFile("D://OMDB-SP-differ/test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
 )
 
 const test = new Differ(source, dest);
 const printer = new ConsolePrinter();
 
-printer.print(test.getViewableLines());
+//printer.print(test.getViewableLines());
 var lines = test.getViewableLines();
 createResultHtml(HtmlGeneratorService.createHtmlView(lines));
 
@@ -74,7 +74,7 @@ function loadFile(filePath: string): string {
 async function createResultHtml(content: string) {
     var timeAppEnd = new Date().getTime();
     content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
-    fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
+    fs.writeFile('./' + `/result.html`, content, (error) => { console.error(error) });
 }
 
 
