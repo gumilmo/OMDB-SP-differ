@@ -74,7 +74,7 @@ function loadFile(filePath: string): string {
 async function createResultHtml(content: string) {
     var timeAppEnd = new Date().getTime();
     content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
-    fs.writeFile('./' + `/result.html`, content, (error) => { console.error(error) });
+    fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
 }
 
 
