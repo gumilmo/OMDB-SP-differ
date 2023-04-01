@@ -86,7 +86,7 @@ export class HtmlGeneratorService {
           .differ-header {
             width: 100%;
             background-color: #eafbff;
-            height: 120px;
+            min-height: 50px;
             border-radius: 15px 15px 0 0;
           }
 
@@ -200,7 +200,9 @@ export class HtmlGeneratorService {
         </head>`
         resultHtmlString += `<body>`;
         resultHtmlString += `<div class="pre-wrapper">`;
-        resultHtmlString += `<div class="differ-header"></div>`
+        resultHtmlString += `<div class="differ-header">
+        
+        </div>`
         resultHtmlString += `<pre>`;
         resultHtmlString += `<div class="split-view-wrapper">`;
         for (let block of result.blocks) {
