@@ -43,6 +43,8 @@ export class HtmlGeneratorService {
         resultHtmlString += `<html>
         <head>
           <style>
+          @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+          
           .split::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -67,15 +69,17 @@ export class HtmlGeneratorService {
           }
           pre {
             white-space: pre-wrap;
-            border-top: 2px solid #d1d1d1;
+            border-top: 1px solid #d1d1d1;
+            border-bottom: 1px solid #d1d1d1;
             margin-top: 0;
           }
           .pre-wrapper {
             border-radius: 15px;
             border: 1px solid #d1d1d1;
             background-color: #f7f7f7;
-            font-size: 16px;
-            height: 90%;
+            font-size: 12px;
+            line-height: 20px;
+            /*height: 90%*/;
             padding-bottom: 20px;
           }
 
@@ -87,10 +91,10 @@ export class HtmlGeneratorService {
           }
 
           .split-view-wrapper {
-            height: 85%;
+            /*height: 85%*/;
             width: 100%;
             display: flex;
-            align-items: center;
+            /*align-items: center*/;
             justify-content: space-between;
           }
 
@@ -111,7 +115,7 @@ export class HtmlGeneratorService {
             }
             
             .right {
-              border-left: 2px solid #d1d1d1; 
+              border-left: 1px solid #d1d1d1; 
             }
 
             .viewable-row {
@@ -121,12 +125,14 @@ export class HtmlGeneratorService {
             }
 
             .str-num {
-              padding-left: 15px
+              min-width: 40px;
+              text-align: right;
             }
 
             ol {
               padding-inline-start: 0px;
               margin-block-start: 0;
+              margin-block-end: 0
             }
 
             li {
@@ -146,7 +152,9 @@ export class HtmlGeneratorService {
             }
 
             .num-deleted-line {
-              background-color: #ffc6c2
+              background-color: #ffc6c2;
+              min-width: 40px;
+              text-align: right;
             }
 
             .li-deleted-line {
@@ -167,7 +175,9 @@ export class HtmlGeneratorService {
             }
 
             .num-inserted-line {
-              background-color: #bafad2
+              background-color: #bafad2;
+              min-width: 40px;
+              text-align: right;
             }
             
             .inserted-line:hover {
