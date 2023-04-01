@@ -30,7 +30,6 @@ export class ConsolePrinter {
         else {
             color = " "
         }
-        const reset = "\u001b[30m"
 
         const oldLineNumber = edit.getOldLineNumber();
         const newLineNumber = edit.getNewLineNumber();
