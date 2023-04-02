@@ -51,11 +51,10 @@ if (options.compare) {
     )
     
     const differ = new Differ(source, dest);
-    const printer = new ConsolePrinter();
 
     //printer.print(test.getViewableLines());
     var lines = differ.getViewableLines();
-    createResultHtml(HtmlGeneratorService.createHtmlView(lines));
+    createResultHtml(HtmlGeneratorService.createHtmlView(lines),source, dest);
 }
 else {
     program.help();
@@ -71,11 +70,24 @@ function loadFile(filePath: string): string {
     }
 }
 
-async function createResultHtml(content: string) {
+async function createResultHtml(content: string, source: ComparableDocument, dest: ComparableDocument) {
     var timeAppEnd = new Date().getTime();
-    content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
+    // content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
     fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
     console.log(`Итоговый файл «result.html» сохранен в директорию ${__dirname}\\result.html. Время работы приложения заняло ${timeAppEnd - timeAppStart} мс`);
+    
+    const prompt = require("prompt-sync")({ sigint: true });
+    const isShowInTerminal = prompt("Вы хотите отобразить изменения в терминале (y/n)");
+
+    if (isShowInTerminal === 'y') {
+        const printer = new ConsolePrinter();
+        const differ = new Differ(source, dest);
+        printer.print(differ.getViewableLines());
+    }
+    else {
+        return;
+    }
+    
    
 }
 

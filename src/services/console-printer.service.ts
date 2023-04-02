@@ -35,7 +35,7 @@ export class ConsolePrinter {
         const newLineNumber = edit.getNewLineNumber();
         const lineText = edit.getlineText();
 
-        console.log("\u001b[30m",color,tag, "\t", oldLineNumber, "\t" , newLineNumber, "\t", lineText);
+        console.log("\u001b[30m",color,tag, "\t", oldLineNumber, "\t" , newLineNumber, "\t", lineText,"\u001b[30m");
     }
 
 }
