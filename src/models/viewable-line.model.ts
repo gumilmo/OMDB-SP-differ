@@ -39,4 +39,8 @@ export class ViewableLine {
         return "";
     }
 
+    public getLineColor(): string {
+        return this.EditType === "deleted" ? "deleted" : this.EditType === "inserted" ? "added" : "equals"
+    }
+
 }

@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, AddHelpTextPosition, OutputConfiguration } from 'commander';
 import { trace } from 'console';
 import * as fs from 'fs';
 import { readFileSync } from 'fs';
@@ -10,33 +10,30 @@ import { Differ } from './services/differ.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
 
 var timeAppStart = new Date().getTime();
+
 const program = new Command();
 program
     .version("1.0")
     .description("CLI приложения для сравнения двух html")
-    .option("--compare <paths...>", "Сравнение файлов")
+    .option("--compare <paths...>", "Сравнение файлов, пример: node lib/main.js C:\\Folder\\old.html C:\\Folder\\new.html")
     .parse(process.argv);
     
 const options = program.opts();
 
-if (options == null) {
-    program.help();
-}
+// const source: ComparableDocument = new ComparableDocument(
+//     loadFile("././test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+// )
 
-const source: ComparableDocument = new ComparableDocument(
-    loadFile("././test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-)
+// const dest: ComparableDocument = new ComparableDocument(
+//     loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+// )
 
-const dest: ComparableDocument = new ComparableDocument(
-    loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-)
+// const test = new Differ(source, dest);
+// const printer = new ConsolePrinter();
 
-const test = new Differ(source, dest);
-const printer = new ConsolePrinter();
-
-//printer.print(test.getViewableLines());
-var lines = test.getViewableLines();
-createResultHtml(HtmlGeneratorService.createHtmlView(lines));
+// //printer.print(test.getViewableLines());
+// var lines = test.getViewableLines();
+// createResultHtml(HtmlGeneratorService.createHtmlView(lines));
 
 if (options.compare) {
 
@@ -45,20 +42,23 @@ if (options.compare) {
        throw new Error(`Не указан путь(и) до файлов ${paths}`);
     }
 
-    // const source: ComparableDocument = new ComparableDocument(
-    //     loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    // )
+    const source: ComparableDocument = new ComparableDocument(
+        loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    )
     
-    // const dest: ComparableDocument = new ComparableDocument(
-    //     loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    // )
+    const dest: ComparableDocument = new ComparableDocument(
+        loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    )
     
-    // const test = new Differ(source, dest);
-    // const printer = new ConsolePrinter();
+    const differ = new Differ(source, dest);
+    const printer = new ConsolePrinter();
 
-    // printer.print(test.diff());
-    // var lines = test.diff();
-    // createResultHtml(test.createHtmlView(lines));
+    //printer.print(test.getViewableLines());
+    var lines = differ.getViewableLines();
+    createResultHtml(HtmlGeneratorService.createHtmlView(lines));
+}
+else {
+    program.help();
 }
 
 function loadFile(filePath: string): string {
@@ -75,6 +75,8 @@ async function createResultHtml(content: string) {
     var timeAppEnd = new Date().getTime();
     content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
     fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
+    console.log(`Итоговый файл «result.html» сохранен в директорию ${__dirname}\\result.html. Время работы приложения заняло ${timeAppEnd - timeAppStart} мс`);
+   
 }
 
 

@@ -3,41 +3,70 @@ import { ViewableLine } from "../models/viewable-line.model";
 export class HtmlGeneratorService {
     
     public static createHtmlView(lines: ViewableLine[]) : string {
+
         let result: Html = new Html();
-        const oldBlock: DivBlock = new DivBlock();
-        oldBlock.class = "split left";
-        const newBlock: DivBlock = new DivBlock();
-        newBlock.class = "split right";
-        
-        for (let line of lines.reverse().filter(x => x.NewLine?.LineIndex != 0 && x.OldLine?.LineIndex != 0)) {
+        const table: Table = new Table();
 
-                const oldLine: LiElement = new LiElement();
-                oldLine.value = line.OldLine?.LineValue ?? "";
-                oldLine.number = line.OldLine?.LineIndex ?? 0;
-                oldLine.color = line.EditType === "deleted" ? "deleted-line" : ""
-                oldBlock.liElements.push(oldLine);
+        for (var line of lines.reverse()) {
 
-                const newLine: LiElement = new LiElement();
-                newLine.value = line.NewLine?.LineValue ?? "";
-                newLine.number = line.NewLine?.LineIndex ?? 0;
-                newLine.color = line.EditType === "inserted" ? "inserted-line" : ""
-                newBlock.liElements.push(newLine);
+          switch (line.EditType) {
+            case "inserted": {
+              let newLineNumberTd: TableCell = new TableCell(line.NewLine?.LineIndex.toString() ?? "");
+              newLineNumberTd.style = 'added-number';
+  
+              let newLineContentTd: TableCell = new TableCell(line.NewLine?.LineValue ?? "");
+              newLineContentTd.style = line.getLineColor();
+  
+              let oldLineNumberTd: TableCell = new TableCell("");
+              oldLineNumberTd.style = "empty";
+  
+              let oldLineContentTd: TableCell = new TableCell("");
+              oldLineContentTd.style = "empty";
+              
+              const tr: TableRow = new TableRow([oldLineNumberTd, oldLineContentTd, newLineNumberTd, newLineContentTd],);
+              table.rows.push(tr);
+              break;
+            }
+            case "deleted": {
+              let newLineNumberTd: TableCell = new TableCell("");
+              newLineNumberTd.style = "empty";
+  
+              let newLineContentTd: TableCell = new TableCell("");
+              newLineContentTd.style = "empty";
+  
+              let oldLineNumberTd: TableCell = new TableCell(line.OldLine?.LineIndex.toString() ?? "");
+              oldLineNumberTd.style = "deleted-number";
+  
+              let oldLineContentTd: TableCell = new TableCell(line.OldLine?.LineValue ?? "");
+              oldLineContentTd.style = line.getLineColor();
+              
+              const tr: TableRow = new TableRow([oldLineNumberTd, oldLineContentTd, newLineNumberTd, newLineContentTd]);
+              table.rows.push(tr);
+              break;
+            }
+            case "equals": {
+              let newLineNumberTd: TableCell = new TableCell(line.NewLine?.LineIndex.toString() ?? "");
+              newLineNumberTd.style = "equals-number";
 
-                if (newLine.value !== oldLine.value && oldLine.number == 0 || newLine.number == 0) {
-                  const emptyLine: LiElement = new LiElement();
-                  emptyLine.value = "";
-                  emptyLine.number = null;
-                  emptyLine.color = "empty-line";
+              let newLineContentTd: TableCell = new TableCell(line.NewLine?.LineValue ?? "");
+              newLineContentTd.style = line.getLineColor();
 
-                  // if (newLine.value == '') 
-                  //   newBlock.liElements.push(emptyLine);
-                  // else
-                  //   oldBlock.liElements.push(emptyLine);
-                }
+              let oldLineNumberTd: TableCell = new TableCell(line.OldLine?.LineIndex.toString() ?? "");
+              oldLineNumberTd.style = "equals-number";
+
+              let oldLineContentTd: TableCell = new TableCell(line.OldLine?.LineValue ?? "");
+              oldLineContentTd.style = line.getLineColor();
+              
+              const tr: TableRow = new TableRow([oldLineNumberTd, oldLineContentTd, newLineNumberTd, newLineContentTd]);
+              table.rows.push(tr);
+              break;
+            }
+            default: break
+          }
         }
 
-        result.blocks.push(oldBlock);
-        result.blocks.push(newBlock);
+        result.table = table;
+        
         let resultHtmlString: string = "";
 
         resultHtmlString += `<html>
@@ -50,7 +79,7 @@ export class HtmlGeneratorService {
             height: 10px;
             cursor: pointer;
           }
-          
+
           .split::-webkit-scrollbar-track {
             border-radius: 10px;
             background-color: #eeeeee;
@@ -195,6 +224,57 @@ export class HtmlGeneratorService {
               padding-right: 20px;
               align-items: flex-start;
             }
+
+            td:nth-child(even) {
+              word-break: break-all;
+            }
+            
+            td {
+              text-align: left;
+              vertical-align: top;
+            }
+            
+            table {
+              border: 0px;
+              border-collapse:collapse;
+            }
+            td tr {
+              border: 0px;
+            }
+
+            .added {
+              background-color: green;
+            }
+
+            .added-number {
+              background-color: green;
+            }
+            
+            .added-number:after {
+              content: '+';
+              left: 5px;
+            }
+            .deleted-number {
+              background-color: red;
+            }
+            .deleted-number:after {
+              content: '-';
+              left: 5px;
+            }
+
+            .equals-number:after {
+              content: '=';
+              left: 5px;
+            }
+
+            .empty {
+              background-color: grey;
+            }
+            
+            .deleted {
+              background-color: red;
+            }
+
             </style>
             <link rel="stylesheet" href="${'./src/static/test.css'}">
         </head>`
@@ -204,20 +284,33 @@ export class HtmlGeneratorService {
         
         </div>`
         resultHtmlString += `<pre>`;
-        resultHtmlString += `<div class="split-view-wrapper">`;
-        for (let block of result.blocks) {
-            resultHtmlString += `<div class=\"${block.class}\">`;
-            resultHtmlString += `<ol>`;
-            for (let li of block.liElements) {
-                resultHtmlString += 
-                `<div class="viewable-row ${li.color}"><p class="str-num num-${li.color}">${li.number}</p><li class="li-${li.color}"><code class="javascript">${li.value.replaceAll("<", "&lt").replaceAll(">", "&gt")}</code></li></div>`;
-            }
-            resultHtmlString += `</ol>`;
-            resultHtmlString += `</div>`;
+      //  resultHtmlString += `<div class="split-view-wrapper">`;
+        // for (let block of result.blocks) {
+        //     resultHtmlString += `<div class=\"${block.class}\">`;
+        //     resultHtmlString += `<ol>`;
+        //     for (let li of block.liElements) {
+        //         resultHtmlString += 
+        //         `<div class="viewable-row ${li.color}"><p class="str-num num-${li.color}">${li.number}</p><li class="li-${li.color}"><code class="javascript">${li.value.replaceAll("<", "&lt").replaceAll(">", "&gt")}</code></li></div>`;
+        //     }
+        //     resultHtmlString += `</ol>`;
+        //     resultHtmlString += `</div>`;
+        // }
+
+        resultHtmlString += `<table>`;
+        for (let tr of result.table.rows) {
+          resultHtmlString += `
+          <tr>
+            <td class=\"${tr.cells[0].style}\">${tr.cells[0].content?.replaceAll(/\s/g, "&emsp;").replaceAll("<", "&lt").replaceAll(">", "&gt")}</td>
+            <td class=\"${tr.cells[1].style}\" >${tr.cells[1].content?.replaceAll(/\s/g, "&emsp;").replaceAll("<", "&lt").replaceAll(">", "&gt")}</td>
+            <td class=\"${tr.cells[2].style}\">${tr.cells[2].content?.replaceAll(/\s/g, "&emsp;").replaceAll("<", "&lt").replaceAll(">", "&gt")}</td>
+            <td class=\"${tr.cells[3].style}\" >${tr.cells[3].content?.replaceAll(/\s/g, "&emsp;").replaceAll("<", "&lt").replaceAll(">", "&gt")}</td>
+          </tr>`
         }
-        resultHtmlString += `</code>`;
+
+        resultHtmlString += `</table>`;
+        //resultHtmlString += `</code>`;
         resultHtmlString += `</pre>`;
-        resultHtmlString += `</div>`;
+       // resultHtmlString += `</div>`;
         resultHtmlString += `<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script>`
         resultHtmlString += `</body>`;
@@ -239,4 +332,20 @@ export class LiElement {
 
 export class Html {
     blocks: DivBlock[] = [];
+    table : Table;
+}
+
+export class Table {
+  rows: TableRow[] = [];
+}
+
+export class TableRow {
+  constructor(cells: TableCell[]) { this.cells = cells }
+  cells: TableCell[] = [];
+}
+
+export class TableCell {
+  constructor(value: string) { this.content = value }
+  content: string;
+  style: string;
 }
