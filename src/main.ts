@@ -73,7 +73,7 @@ async function createResultHtml(content: string, lines: ViewableLine[]) {
 
     if (isShowInTerminal === 'y') {
         const printer = new ConsolePrinter();
-        printer.print(lines);
+        printer.print(lines.reverse());
     }
     else {
         return;
