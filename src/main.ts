@@ -8,6 +8,7 @@ import { ViewableLine } from './models/viewable-line.model';
 import { ConsolePrinter } from './services/console-printer.service';
 import { Differ } from './services/differ.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
+import path from 'path';
 
 var timeAppStart = new Date().getTime();
 
@@ -47,7 +48,7 @@ if (options.compare) {
 
     var lines = differ.getViewableLines();
     var timeAppEnd = new Date().getTime();
-    createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, 'file1', 'file2'),lines,timeAppEnd);
+    createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
 }
 else {
     program.help();
