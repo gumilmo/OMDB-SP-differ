@@ -8,6 +8,7 @@ import { ViewableLine } from './models/viewable-line.model';
 import { ConsolePrinter } from './services/console-printer.service';
 import { Differ } from './services/differ.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
+import path from 'path';
 
 var timeAppStart = new Date().getTime();
 

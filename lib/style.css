@@ -157,7 +157,7 @@
           }
           
           .deleted:before {
-            content: "+";
+            content: "-";
             align-items: flex-start;
             padding-left: 15px;
             height: 100%;
