@@ -46,7 +46,8 @@ if (options.compare) {
     const differ = new Differ(source, dest);
 
     var lines = differ.getViewableLines();
-    createResultHtml(HtmlGeneratorService.createHtmlView(lines),lines);
+    var timeAppEnd = new Date().getTime();
+    createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, 'file1', 'file2'),lines,timeAppEnd);
 }
 else {
     program.help();
@@ -62,8 +63,7 @@ function loadFile(filePath: string): string {
     }
 }
 
-async function createResultHtml(content: string, lines: ViewableLine[]) {
-    var timeAppEnd = new Date().getTime();
+async function createResultHtml(content: string, lines: ViewableLine[], endTime: number) {
     // content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
     fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
     console.log(`Итоговый файл «result.html» сохранен в директорию ${__dirname}\\result.html. Время работы приложения заняло ${timeAppEnd - timeAppStart} мс`);

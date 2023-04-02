@@ -2,10 +2,20 @@ import { ViewableLine } from "../models/viewable-line.model";
 
 export class HtmlGeneratorService {
     
-    public static createHtmlView(lines: ViewableLine[]) : string {
+    public static createHtmlView(
+      lines: ViewableLine[], 
+      startTime: number, 
+      endTime: number,
+      sourceFileName: string,
+      destFileName: string
+      ) : string {
 
         let result: Html = new Html();
         const table: Table = new Table();
+
+        let addedCount = 0;
+        let deletedCount = 0;
+        let equalsCount = 0;
 
         for (var line of lines.reverse()) {
 
@@ -25,6 +35,7 @@ export class HtmlGeneratorService {
               
               const tr: TableRow = new TableRow([oldLineNumberTd, oldLineContentTd, newLineNumberTd, newLineContentTd],);
               table.rows.push(tr);
+              addedCount++;
               break;
             }
             case "deleted": {
@@ -42,6 +53,7 @@ export class HtmlGeneratorService {
               
               const tr: TableRow = new TableRow([oldLineNumberTd, oldLineContentTd, newLineNumberTd, newLineContentTd]);
               table.rows.push(tr);
+              deletedCount++;
               break;
             }
             case "equals": {
@@ -59,6 +71,7 @@ export class HtmlGeneratorService {
               
               const tr: TableRow = new TableRow([oldLineNumberTd, oldLineContentTd, newLineNumberTd, newLineContentTd]);
               table.rows.push(tr);
+              equalsCount++;
               break;
             }
             default: break
@@ -89,17 +102,17 @@ export class HtmlGeneratorService {
         <div class="header-block statistic">
 
           <div class="file-names">
-            <p class="file-name">ВСТАВИТЬ ИМЯ ФАЙЛА1 /</p>
-            <p class="file-name2">ВСТАВИТЬ ИМЯ ФАЙЛА2</p>
+            <p class="file-name">${sourceFileName} /</p>
+            <p class="file-name2">${destFileName}</p>
           </div>
           
           <div class="changes">
-            <div class="chng-block chng-ins"><p>+(10)</p></div>
-            <div class="chng-block chng-del"><p>-(100)</p></div>
-            <div class="chng-block chng-equ"><p>=(14)</p></div>
+            <div class="chng-block chng-ins"><p>${addedCount} +</p></div>
+            <div class="chng-block chng-del"><p>${deletedCount} -</p></div>
+            <div class="chng-block chng-equ"><p>${equalsCount} =</p></div>
           </div>
 
-          <p class="time-label">время работы программы</p>
+          <p class="time-label">Время работы программы: ${(endTime - startTime) / 1000} сек.</p>
         </div>
       </div>
   </div>`;
