@@ -28,13 +28,6 @@ const options = program.opts();
 //     loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
 // )
 
-// const test = new Differ(source, dest);
-// const printer = new ConsolePrinter();
-
-// //printer.print(test.getViewableLines());
-// var lines = test.getViewableLines();
-// createResultHtml(HtmlGeneratorService.createHtmlView(lines));
-
 if (options.compare) {
 
     const paths: string[] = options.compare as string[];
@@ -52,9 +45,8 @@ if (options.compare) {
     
     const differ = new Differ(source, dest);
 
-    //printer.print(test.getViewableLines());
     var lines = differ.getViewableLines();
-    createResultHtml(HtmlGeneratorService.createHtmlView(lines),source, dest);
+    createResultHtml(HtmlGeneratorService.createHtmlView(lines),lines);
 }
 else {
     program.help();
@@ -70,7 +62,7 @@ function loadFile(filePath: string): string {
     }
 }
 
-async function createResultHtml(content: string, source: ComparableDocument, dest: ComparableDocument) {
+async function createResultHtml(content: string, lines: ViewableLine[]) {
     var timeAppEnd = new Date().getTime();
     // content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
     fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
@@ -81,8 +73,7 @@ async function createResultHtml(content: string, source: ComparableDocument, des
 
     if (isShowInTerminal === 'y') {
         const printer = new ConsolePrinter();
-        const differ = new Differ(source, dest);
-        printer.print(differ.getViewableLines());
+        printer.print(lines);
     }
     else {
         return;
