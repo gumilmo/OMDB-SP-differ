@@ -11,7 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^10.0.0",
-    "figlet": "^1.5.2"
+    "figlet": "^1.5.2",
+    "prompt-sync": "^4.2.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.10",
