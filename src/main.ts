@@ -42,9 +42,6 @@ const dest: ComparableDocument = new ComparableDocument(
 const SourceBody = sourceFileJSdom.window.document.querySelector('body');
 const DestBody = destFileJSdom.window.document.querySelector('body');
 
-let jsonFromDest = null;
-let jsonFromSource = null;
-
 const serv = new DifferDomSerivce(SourceBody, DestBody);
 serv.convertToDom();
 
