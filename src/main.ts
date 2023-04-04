@@ -12,31 +12,8 @@ import path from 'path';
 import { JSDOM } from 'jsdom'
 import { plainToClass } from "class-transformer";
 import { json } from 'stream/consumers';
+import { DifferDomSerivce } from './services/differ-dom.serivce'
 
-class DOMElement {
-    // constructor (tagName: string, textContent: string, attirbutes: string, children: DOMElement[]) {
-    //     this.TagName = tagName;
-    //     this.TextContetn = textContent;
-    //     this.Attributes = attirbutes;
-    //     this.Children = children;
-    // }
-
-    TagName :string;
-    TextContetn: string;
-    Attributes: string;
-    Children: DOMElement[];
-
-    static FromJson(d: Object): DOMElement {
-        return Object.assign(new DOMElement, d);
-    }
-}
-
-interface ElementJSON {
-    tagName: string;
-    textContent: string;
-    attributes: [string, string][];
-    children: ElementJSON[];
-  }
 
 var timeAppStart = new Date().getTime();
 
@@ -55,30 +32,21 @@ const source: ComparableDocument = new ComparableDocument(
     loadFile("././test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
 )
 
-const test = new JSDOM(readFileSync("././test-pages/1-src.html").toString());
+const sourceFileJSdom = new JSDOM(readFileSync("././test-pages/1-src.html").toString());
+const destFileJSdom = new JSDOM(readFileSync("././test-pages/1-dst.html").toString());
 
 const dest: ComparableDocument = new ComparableDocument(
     loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
 )
 
-const DestBody = test.window.document.querySelector('body');
-let jsonFromDest = null;
-  
-  const Elem = (e: Element): ElementJSON => ({
-    tagName: e.tagName,
-    textContent: e.textContent ?? "",
-    attributes: Array.from(e.attributes, ({name, value}) => [name, value]),
-    children: Array.from(e.children, Elem)
-  });
-  
-  const html2json = (e: Element): string =>
-    JSON.stringify(Elem(e), null, '');
+const SourceBody = sourceFileJSdom.window.document.querySelector('body');
+const DestBody = destFileJSdom.window.document.querySelector('body');
 
-if (DestBody != null) {
-    jsonFromDest = html2json(DestBody);
-    const DOMDest = DOMElement.FromJson(JSON.parse(jsonFromDest));
-    const aaaa = 1;
-}
+let jsonFromDest = null;
+let jsonFromSource = null;
+
+const serv = new DifferDomSerivce(SourceBody, DestBody);
+serv.convertToDom();
 
 const differ = new Differ(source, dest);
 // var lines = differ.getViewableLines();
