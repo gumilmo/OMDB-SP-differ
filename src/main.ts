@@ -9,6 +9,34 @@ import { ConsolePrinter } from './services/console-printer.service';
 import { Differ } from './services/differ.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
 import path from 'path';
+import { JSDOM } from 'jsdom'
+import { plainToClass } from "class-transformer";
+import { json } from 'stream/consumers';
+
+class DOMElement {
+    // constructor (tagName: string, textContent: string, attirbutes: string, children: DOMElement[]) {
+    //     this.TagName = tagName;
+    //     this.TextContetn = textContent;
+    //     this.Attributes = attirbutes;
+    //     this.Children = children;
+    // }
+
+    TagName :string;
+    TextContetn: string;
+    Attributes: string;
+    Children: DOMElement[];
+
+    static FromJson(d: Object): DOMElement {
+        return Object.assign(new DOMElement, d);
+    }
+}
+
+interface ElementJSON {
+    tagName: string;
+    textContent: string;
+    attributes: [string, string][];
+    children: ElementJSON[];
+  }
 
 var timeAppStart = new Date().getTime();
 
@@ -21,38 +49,68 @@ program
     
 const options = program.opts();
 
-// const source: ComparableDocument = new ComparableDocument(
-//     loadFile("././test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-// )
 
-// const dest: ComparableDocument = new ComparableDocument(
-//     loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-// )
 
-if (options.compare) {
+const source: ComparableDocument = new ComparableDocument(
+    loadFile("././test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+)
 
-    const paths: string[] = options.compare as string[];
-    if (!paths || paths.length < 2) {
-       throw new Error(`Не указан путь(и) до файлов ${paths}`);
-    }
+const test = new JSDOM(readFileSync("././test-pages/1-src.html").toString());
 
-    const source: ComparableDocument = new ComparableDocument(
-        loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    )
-    
-    const dest: ComparableDocument = new ComparableDocument(
-        loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    )
-    
-    const differ = new Differ(source, dest);
+const dest: ComparableDocument = new ComparableDocument(
+    loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+)
 
-    var lines = differ.getViewableLines();
-    var timeAppEnd = new Date().getTime();
-    createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
+const DestBody = test.window.document.querySelector('body');
+let jsonFromDest = null;
+  
+  const Elem = (e: Element): ElementJSON => ({
+    tagName: e.tagName,
+    textContent: e.textContent ?? "",
+    attributes: Array.from(e.attributes, ({name, value}) => [name, value]),
+    children: Array.from(e.children, Elem)
+  });
+  
+  const html2json = (e: Element): string =>
+    JSON.stringify(Elem(e), null, '');
+
+if (DestBody != null) {
+    jsonFromDest = html2json(DestBody);
+    const DOMDest = DOMElement.FromJson(JSON.parse(jsonFromDest));
+    const aaaa = 1;
 }
-else {
-    program.help();
-}
+
+const differ = new Differ(source, dest);
+// var lines = differ.getViewableLines();
+
+
+
+// createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, 0, '', ''),lines,0);
+
+// if (options.compare) {
+
+//     const paths: string[] = options.compare as string[];
+//     if (!paths || paths.length < 2) {
+//        throw new Error(`Не указан путь(и) до файлов ${paths}`);
+//     }
+
+//     const source: ComparableDocument = new ComparableDocument(
+//         loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+//     )
+    
+//     const dest: ComparableDocument = new ComparableDocument(
+//         loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+//     )
+    
+//     const differ = new Differ(source, dest);
+
+//     var lines = differ.getViewableLines();
+//     var timeAppEnd = new Date().getTime();
+//     createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
+// }
+// else {
+//     program.help();
+// }
 
 function loadFile(filePath: string): string {
     try {
@@ -67,7 +125,7 @@ function loadFile(filePath: string): string {
 async function createResultHtml(content: string, lines: ViewableLine[], endTime: number) {
     // content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
     fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
-    console.log(`Итоговый файл «result.html» сохранен в директорию ${__dirname}\\result.html. Время работы приложения заняло ${timeAppEnd - timeAppStart} мс`);
+    console.log(`Итоговый файл «result.html» сохранен в директорию ${__dirname}\\result.html. Время работы приложения заняло ${1 - timeAppStart} мс`);
     
     const prompt = require("prompt-sync")({ sigint: true });
     const isShowInTerminal = prompt("Вы хотите отобразить изменения в терминале (y/n)");
