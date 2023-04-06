@@ -58,12 +58,10 @@ if (options.compare) {
 
     const differDomService = new DifferDomSerivce(SourceBody, DestBody);
 
-    const serv = new DifferDomSerivce(SourceBody, DestBody);
-
     let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
     
     let final = '<body>';
-    final += serv.DOMHandler();
+    final += differDomService.DOMHandler();
     final += `<script type="text/javascript" src="./interact.js"></script>`
     final += '</body>';
     final += '</html>';
@@ -85,7 +83,6 @@ function loadFile(filePath: string): string {
 }
 
 async function createResultHtmlFileDiffer(content: string, lines: ViewableLine[], endTime: number) {
-    // content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
     fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
     console.log(`Итоговый файл «result.html» сохранен в директорию ${__dirname}\\result.html. Время работы приложения заняло ${endTime - timeAppStart} мс`);
     
@@ -102,7 +99,6 @@ async function createResultHtmlFileDiffer(content: string, lines: ViewableLine[]
 }
 
 async function createResultHtmlDomDiffer(content: string, endTime: number) {
-    // content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
     fs.writeFile(__dirname + `/compareresult.html`, content, (error) => { console.error(error) });
     console.log(`Итоговый файл compareresult.html» сохранен в директорию ${__dirname}\\compareresult.html. Время работы приложения заняло ${endTime - timeAppStart} мс`);
 }
