@@ -1,5 +1,6 @@
 import { Command, AddHelpTextPosition, OutputConfiguration } from 'commander';
 import { trace } from 'console';
+import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import { readFileSync } from 'fs';
 import { ComparableDocument } from './models/comparable-document.model';
@@ -13,6 +14,8 @@ import { JSDOM } from 'jsdom'
 import { plainToClass } from "class-transformer";
 import { json } from 'stream/consumers';
 import { DifferDomSerivce } from './services/differ-dom.serivce'
+
+const beautify = require('beautify');
 
 
 var timeAppStart = new Date().getTime();
@@ -32,18 +35,18 @@ const source: ComparableDocument = new ComparableDocument(
     loadFile("././test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
 )
 
-const sourceFileJSdom = new JSDOM(readFileSync("././test-pages/1-src.html").toString());
-const destFileJSdom = new JSDOM(readFileSync("././test-pages/1-dst.html").toString());
-
 const dest: ComparableDocument = new ComparableDocument(
     loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
 )
+
+const sourceFileJSdom = new JSDOM(readFileSync("././test-pages/10-src.html").toString());
+const destFileJSdom = new JSDOM(readFileSync("././test-pages/10-dst.html").toString());
 
 const SourceBody = sourceFileJSdom.window.document.querySelector('body');
 const DestBody = destFileJSdom.window.document.querySelector('body');
 
 const serv = new DifferDomSerivce(SourceBody, DestBody);
-serv.convertToDom();
+serv.DOMHandler();
 
 const differ = new Differ(source, dest);
 // var lines = differ.getViewableLines();
@@ -52,30 +55,30 @@ const differ = new Differ(source, dest);
 
 // createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, 0, '', ''),lines,0);
 
-// if (options.compare) {
+if (options.compare) {
 
-//     const paths: string[] = options.compare as string[];
-//     if (!paths || paths.length < 2) {
-//        throw new Error(`Не указан путь(и) до файлов ${paths}`);
-//     }
+    const paths: string[] = options.compare as string[];
+    if (!paths || paths.length < 2) {
+       throw new Error(`Не указан путь(и) до файлов ${paths}`);
+    }
 
-//     const source: ComparableDocument = new ComparableDocument(
-//         loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-//     )
+    const source: ComparableDocument = new ComparableDocument(
+        loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    )
     
-//     const dest: ComparableDocument = new ComparableDocument(
-//         loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-//     )
+    const dest: ComparableDocument = new ComparableDocument(
+        loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    )
     
-//     const differ = new Differ(source, dest);
+    const differ = new Differ(source, dest);
 
-//     var lines = differ.getViewableLines();
-//     var timeAppEnd = new Date().getTime();
-//     createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
-// }
-// else {
-//     program.help();
-// }
+    var lines = differ.getViewableLines();
+    var timeAppEnd = new Date().getTime();
+    createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
+}
+else {
+    program.help();
+}
 
 function loadFile(filePath: string): string {
     try {
