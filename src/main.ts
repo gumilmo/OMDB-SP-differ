@@ -52,7 +52,8 @@ const styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.sp
 let final = serv.DOMHandler();
 
 let result: string | undefined = styles;
-result += final;
+
+fs.writeFileSync(__dirname + `/resultview.html`, result += final);
 
 if (result !== undefined) {
     createResultHtml(result, [], 3)
@@ -93,9 +94,10 @@ if (options.compare) {
     const SourceBody = sourceFileJSdom.window.document.querySelector('body');
     const DestBody = destFileJSdom.window.document.querySelector('body');
 
-    const serv = new DifferDomSerivce(SourceBody, DestBody);
+    const differDomService = new DifferDomSerivce(SourceBody, DestBody);
 
     const styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
+    const final = differDomService.DOMHandler();
 }
 else {
     program.help();
