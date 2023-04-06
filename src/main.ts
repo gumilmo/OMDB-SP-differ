@@ -39,14 +39,25 @@ const dest: ComparableDocument = new ComparableDocument(
     loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
 )
 
-const sourceFileJSdom = new JSDOM(readFileSync("././test-pages/10-src.html").toString());
-const destFileJSdom = new JSDOM(readFileSync("././test-pages/10-dst.html").toString());
+const sourceFileJSdom = new JSDOM(readFileSync("././test-pages/1-src.html").toString());
+const destFileJSdom = new JSDOM(readFileSync("././test-pages/1-dst.html").toString());
 
 const SourceBody = sourceFileJSdom.window.document.querySelector('body');
 const DestBody = destFileJSdom.window.document.querySelector('body');
 
 const serv = new DifferDomSerivce(SourceBody, DestBody);
-serv.DOMHandler();
+
+const styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
+
+let final = serv.DOMHandler();
+
+let result: string | undefined = styles;
+result += final;
+
+if (result !== undefined) {
+    createResultHtml(result, [], 3)
+}
+
 
 const differ = new Differ(source, dest);
 // var lines = differ.getViewableLines();
@@ -75,6 +86,16 @@ if (options.compare) {
     var lines = differ.getViewableLines();
     var timeAppEnd = new Date().getTime();
     createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
+
+    const sourceFileJSdom = new JSDOM(readFileSync("././test-pages/10-src.html").toString());
+    const destFileJSdom = new JSDOM(readFileSync("././test-pages/10-dst.html").toString());
+
+    const SourceBody = sourceFileJSdom.window.document.querySelector('body');
+    const DestBody = destFileJSdom.window.document.querySelector('body');
+
+    const serv = new DifferDomSerivce(SourceBody, DestBody);
+
+    const styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
 }
 else {
     program.help();

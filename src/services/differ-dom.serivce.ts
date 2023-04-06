@@ -1,36 +1,6 @@
-class DOMElement {
-    TagName :string;
-    TextContent: string | null;
-    Attributes: string[];
-    AttributesValue: string[];
-    TrueAttr: string[][];
-    WasViewed: boolean;
-    Children: DOMElement[];
-}
+import { DOMElement } from "../models/dom-element.model";
 
-function FromJson(d: Object, newObject: Object): Object {
-    return Object.assign(new DOMElement, d);
-}
-  
-const Elem = (e: Element): DOMElement => ({
-    TagName: e.tagName,
-    TextContent: e.textContent ?? "",
-    Attributes: e.getAttributeNames(),
-    AttributesValue: Array.from(e.attributes, ({value}) => value),
-    TrueAttr: Array.from(e.attributes, ({name, value}) => [name, value]),
-    WasViewed: false,
-    Children: Array.from(e.children, Elem),
-});
-
-  const html2json = (e: Element): string =>
-  JSON.stringify(Elem(e), null, '');
-
-  function markUpToJson(element: Element): string {
-    return JSON.stringify(Elem)
-  }
-  
-
- export class DifferDomSerivce {
+export class DifferDomSerivce {
     constructor (domSource: HTMLBodyElement | null, domDest: HTMLBodyElement | null) {
         this.DomSource = domSource;
         this.DomDest = domDest;
@@ -45,23 +15,130 @@ const Elem = (e: Element): DOMElement => ({
         let jsonFromSource = null;
 
         if (this.DomSource != null && this.DomDest != null) {
-            jsonFromSource = html2json(this.DomSource);
-            jsonFromDest = html2json(this.DomDest);
+            jsonFromSource = this.markUpToJson(this.DomSource);
+            jsonFromDest = this.markUpToJson(this.DomDest);
             
-            const DOMSource: any =FromJson(JSON.parse(jsonFromSource), Object);
-            const DOMDest: any = FromJson(JSON.parse(jsonFromDest), Object);
+            const DOMSource: any = this.FromJson(JSON.parse(jsonFromSource));
+            const DOMDest: any = this.FromJson(JSON.parse(jsonFromDest));
 
-            compareDOM(DOMSource, DOMDest);
+            this.goDeepCompare(DOMSource, DOMDest);
 
-            return convertToHtml(DOMDest)
+            return this.convertToHtml(DOMDest)
         }
         
         return '';
     }
 
-    private compareDOM(source: any, dest: any, finalDom: any) {
-        
+    private markUpToJson = (e: Element): string =>
+    JSON.stringify(this.ElementToDOMElement(e), null, '');
+
+    private ElementToDOMElement = (element: Element): DOMElement => ({
+        TagName: element.tagName,
+        TextContent: element.textContent ?? "",
+        Attributes: element.getAttributeNames(),
+        AttributesValue: Array.from(element.attributes, ({value}) => value),
+        WasViewed: false,
+        Children: Array.from(element.children, this.ElementToDOMElement),
+    });
+
+    private FromJson(d: Object): Object {
+        return Object.assign(new DOMElement, d);
     }
+
+    private goDeepCompare(source: DOMElement, dest: DOMElement): void {
+        if (source != undefined)
+        dest.Children.forEach( (child, index) => {
+            if (child.Children.length !== 0) {
+                this.goDeepCompare(source.Children[index], child)
+            }
+            else {
+                const sourceElem = source.Children[index];
+                const destElem = child;
+                if (sourceElem == undefined) {
+                    destElem.WasViewed = true;
+                    destElem.Attributes.push("style");
+                    destElem.AttributesValue.push(`background-image: linear-gradient(45deg, #bee8be 16.67%, #f1f5f0 16.67%, #f1f5f0 50%, #bee8be 50%, #bee8be 66.67%, #f1f5f0 66.67%, #f1f5f0 100%);background-size: 12.73px 12.73px;`);
+                }
+                else {
+                    if (destElem.TagName == sourceElem.TagName) {
+                        if (sourceElem.TextContent != destElem.TextContent) {
+                            dest.WasViewed = true;
+                            source.WasViewed = true;
+                            destElem.WasViewed = true;
+                            sourceElem.WasViewed = true;
+                            destElem.Attributes.push("class");
+                            destElem.Attributes.push("style");
+                            destElem.Attributes.push("oldValue");
+                            destElem.AttributesValue.push("changedValue");
+                            destElem.AttributesValue.push(`cursor: poiner; background-image: linear-gradient(45deg, #faeb7d 16.67%, #ffffff 16.67%, #ffffff 50%, #faeb7d 50%, #faeb7d 66.67%, #ffffff 66.67%, #ffffff 100%); background-size: 12.73px 12.73px;`);
+                            destElem.AttributesValue.push(`${sourceElem.TextContent}`);
+                        }
+                    }
+                    else {
+                        source.WasViewed = true;
+                        sourceElem.WasViewed = true;
+                        sourceElem.Attributes.push("style");
+                        sourceElem.AttributesValue.push(`cursor: poiner; background-image: linear-gradient(45deg, #f09e6e 16.67%, #f1f5f0 16.67%, #f1f5f0 50%, #f09e6e 50%, #f09e6e 66.67%, #f1f5f0 66.67%, #f1f5f0 100%);background-size: 12.73px 12.73px;`);
+                        dest.Children.unshift(sourceElem);
+                        dest.WasViewed = true;
+                        destElem.WasViewed = true;
+                        destElem.Attributes.push("style");
+                        destElem.AttributesValue.push(`cursor: poiner; background-image: linear-gradient(45deg, #bee8be 16.67%, #f1f5f0 16.67%, #f1f5f0 50%, #bee8be 50%, #bee8be 66.67%, #f1f5f0 66.67%, #f1f5f0 100%);background-size: 12.73px 12.73px;`);
+                    }
+                }
+            }
+            if (dest.Children.length != source.Children.length) {
+                if (dest.Children.length > source.Children.length) {
+                    dest.Children.forEach( (destChild, index) => {
+                        if (source.Children[index] === undefined) {
+                            destChild.WasViewed = true;
+                            destChild.Attributes.push("style");
+                            destChild.AttributesValue.push(`cursor: poiner; background-image: linear-gradient(45deg, #bee8be 16.67%, #f1f5f0 16.67%, #f1f5f0 50%, #bee8be 50%, #bee8be 66.67%, #f1f5f0 66.67%, #f1f5f0 100%);background-size: 12.73px 12.73px;`);
+                        }
+                    });
+                }
+                else {
+                    source.Children.forEach( (sourceChild, index) => {
+                        if (dest.Children[index] === undefined) {
+                            sourceChild.WasViewed = true;
+                            sourceChild.Attributes.push("style");
+                            sourceChild.AttributesValue.push(`cursor: poiner; background-image: linear-gradient(45deg, #f09e6e 16.67%, #f1f5f0 16.67%, #f1f5f0 50%, #f09e6e 50%, #f09e6e 66.67%, #f1f5f0 66.67%, #f1f5f0 100%);background-size: 12.73px 12.73px;`);
+                            dest.Children.push(sourceChild);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private convertToHtml(domTree: DOMElement, str = ''): string {
+        let result = str;
+        if (domTree.Children.length !== 0) {
+            domTree.Children.forEach((child) => {
+                let attributes = '';
+                child.Attributes.forEach((attr, index) => {
+                    let equalsSign = '='
+                    const attrValue = child.AttributesValue[index].replace('"','');
+                    if (child.AttributesValue[index].includes('<') || child.AttributesValue[index].includes('>')) {
+                        child.AttributesValue[index] = '';
+                    }
+                    if (child.AttributesValue[index] === ' ' || child.AttributesValue[index] ==='')
+                        equalsSign = ''
+                    attributes += attr.replace(`"`, '') + `${equalsSign}` + `"${child.AttributesValue[index].replace('=', '')}" `;
+                });
+                if (child.Children.length !== 0) {
+                    child.TextContent = '';
+                }
+    
+                result += `<${child.TagName.toLowerCase()} ${attributes} >${this.convertToHtml(
+                    child,
+                    str,
+                )}${child.TextContent}</${child.TagName.toLowerCase()}>`;
+            });
+        }
+    
+        return result;
+    };
 }
 
 function compareDOM(source: DOMElement, dest: DOMElement) {
