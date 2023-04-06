@@ -29,44 +29,6 @@ program
     
 const options = program.opts();
 
-
-
-const source: ComparableDocument = new ComparableDocument(
-    loadFile("././test-pages/1-src.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-)
-
-const dest: ComparableDocument = new ComparableDocument(
-    loadFile("././test-pages/1-dst.html").toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-)
-
-const sourceFileJSdom = new JSDOM(readFileSync("././test-pages/1-src.html").toString());
-const destFileJSdom = new JSDOM(readFileSync("././test-pages/1-dst.html").toString());
-
-const SourceBody = sourceFileJSdom.window.document.querySelector('body');
-const DestBody = destFileJSdom.window.document.querySelector('body');
-
-const serv = new DifferDomSerivce(SourceBody, DestBody);
-
-const styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
-
-let final = serv.DOMHandler();
-
-let result: string | undefined = styles;
-
-fs.writeFileSync(__dirname + `/resultview.html`, result += final);
-
-if (result !== undefined) {
-    createResultHtml(result, [], 3)
-}
-
-
-const differ = new Differ(source, dest);
-// var lines = differ.getViewableLines();
-
-
-
-// createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, 0, '', ''),lines,0);
-
 if (options.compare) {
 
     const paths: string[] = options.compare as string[];
@@ -86,18 +48,27 @@ if (options.compare) {
 
     var lines = differ.getViewableLines();
     var timeAppEnd = new Date().getTime();
-    createResultHtml(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
+    createResultHtmlFileDiffer(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
 
-    const sourceFileJSdom = new JSDOM(readFileSync("././test-pages/10-src.html").toString());
-    const destFileJSdom = new JSDOM(readFileSync("././test-pages/10-dst.html").toString());
+    const sourceFileJSdom = new JSDOM(loadFile(paths[0]));
+    const destFileJSdom = new JSDOM(loadFile(paths[1]));
 
     const SourceBody = sourceFileJSdom.window.document.querySelector('body');
     const DestBody = destFileJSdom.window.document.querySelector('body');
 
     const differDomService = new DifferDomSerivce(SourceBody, DestBody);
 
-    const styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
-    const final = differDomService.DOMHandler();
+    const serv = new DifferDomSerivce(SourceBody, DestBody);
+
+    let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
+    
+    let final = '<body>';
+    final += serv.DOMHandler();
+    final += `<script type="text/javascript" src="./interact.js"></script>`
+    final += '</body>';
+    final += '</html>';
+
+    createResultHtmlDomDiffer(styles += final, timeAppEnd)
 }
 else {
     program.help();
@@ -113,10 +84,10 @@ function loadFile(filePath: string): string {
     }
 }
 
-async function createResultHtml(content: string, lines: ViewableLine[], endTime: number) {
+async function createResultHtmlFileDiffer(content: string, lines: ViewableLine[], endTime: number) {
     // content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
     fs.writeFile(__dirname + `/result.html`, content, (error) => { console.error(error) });
-    console.log(`Итоговый файл «result.html» сохранен в директорию ${__dirname}\\result.html. Время работы приложения заняло ${1 - timeAppStart} мс`);
+    console.log(`Итоговый файл «result.html» сохранен в директорию ${__dirname}\\result.html. Время работы приложения заняло ${endTime - timeAppStart} мс`);
     
     const prompt = require("prompt-sync")({ sigint: true });
     const isShowInTerminal = prompt("Вы хотите отобразить изменения в терминале (y/n)");
@@ -128,8 +99,12 @@ async function createResultHtml(content: string, lines: ViewableLine[], endTime:
     else {
         return;
     }
-    
-   
+}
+
+async function createResultHtmlDomDiffer(content: string, endTime: number) {
+    // content += `<span>Время работы программы заняло: ${timeAppEnd - timeAppStart} миллисекунд</span>`
+    fs.writeFile(__dirname + `/compareresult.html`, content, (error) => { console.error(error) });
+    console.log(`Итоговый файл compareresult.html» сохранен в директорию ${__dirname}\\compareresult.html. Время работы приложения заняло ${endTime - timeAppStart} мс`);
 }
 
 

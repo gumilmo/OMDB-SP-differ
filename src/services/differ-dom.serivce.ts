@@ -58,7 +58,9 @@ export class DifferDomSerivce {
                 if (sourceElem == undefined) {
                     destElem.WasViewed = true;
                     destElem.Attributes.push("style");
+                    destElem.Attributes.push("newelement");
                     destElem.AttributesValue.push(`cursor: pointer; border: 4px solid green; padding: 10px`);
+                    destElem.AttributesValue.push("+")
                 }
                 else {
                     if (destElem.TagName == sourceElem.TagName) {
@@ -81,12 +83,16 @@ export class DifferDomSerivce {
                         source.WasViewed = true;
                         sourceElem.WasViewed = true;
                         sourceElem.Attributes.push("style");
+                        sourceElem.Attributes.push("deletedelement");
                         sourceElem.AttributesValue.push(`cursor: pointer; border: 4px solid red; padding: 10px`);
+                        sourceElem.AttributesValue.push("-")
                         dest.Children.unshift(sourceElem);
                         dest.WasViewed = true;
                         destElem.WasViewed = true;
                         destElem.Attributes.push("style");
+                        destElem.Attributes.push("newelement");
                         destElem.AttributesValue.push(`cursor: pointer; border: 4px solid green; padding: 10px`);
+                        destElem.AttributesValue.push("+")
                     }
                 }
             }
@@ -97,7 +103,9 @@ export class DifferDomSerivce {
                         if (source.Children[index] === undefined) {
                             destChild.WasViewed = true;
                             destChild.Attributes.push("style");
+                            destChild.Attributes.push("newelement");
                             destChild.AttributesValue.push(`cursor: pointer; border: 4px solid green; padding: 10px`);
+                            destChild.AttributesValue.push("+")
                         }
                     });
                 }
@@ -107,7 +115,9 @@ export class DifferDomSerivce {
                         if (dest.Children[index] === undefined) {
                             sourceChild.WasViewed = true;
                             sourceChild.Attributes.push("style");
+                            sourceChild.Attributes.push("deletedelement");
                             sourceChild.AttributesValue.push(`cursor: pointer; border: 4px solid red; padding: 10px`);
+                            sourceChild.AttributesValue.push("-")
                             dest.Children.push(sourceChild);
                         }
                     });
