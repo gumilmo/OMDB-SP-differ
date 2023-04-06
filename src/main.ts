@@ -58,7 +58,7 @@ if (options.compare) {
 
     const differDomService = new DifferDomSerivce(SourceBody, DestBody);
 
-    let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
+    let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
     
     let final = '<body>';
     final += differDomService.DOMHandler();
