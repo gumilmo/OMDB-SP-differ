@@ -7,13 +7,13 @@ import { ComparableDocument } from './models/comparable-document.model';
 import { Line } from './models/line.model';
 import { ViewableLine } from './models/viewable-line.model';
 import { ConsolePrinter } from './services/console-printer.service';
-import { Differ } from './services/differ.service';
+import { Differ } from './services/differ-services/differ-file.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
 import path from 'path';
 import { JSDOM } from 'jsdom'
 import { plainToClass } from "class-transformer";
 import { json } from 'stream/consumers';
-import { DifferDomSerivce } from './services/differ-dom.serivce'
+import { DifferDomSerivce } from './services/differ-services/differ-dom.serivce'
 
 const beautify = require('beautify');
 

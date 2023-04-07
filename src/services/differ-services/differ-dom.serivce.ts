@@ -1,4 +1,4 @@
-import { DOMElement } from "../models/dom-element.model";
+import { DOMElement } from "../../models/dom-element.model";
 
 export class DifferDomSerivce {
     constructor (domSource: HTMLBodyElement | null, domDest: HTMLBodyElement | null) {
@@ -9,6 +9,9 @@ export class DifferDomSerivce {
     DomSource: HTMLBodyElement | null;
     DomDest: HTMLBodyElement | null;
 
+    private addedStyle: string = `cursor: pointer; border: 4px solid green; padding: 10px`;
+    private deletedStyle: string = `cursor: pointer; border: 4px solid red; padding: 10px`;
+    private changedStyle: string = `cursor: pointer; border: 4px solid orange; padding: 10px`;
 
     public DOMHandler(): string {
         let jsonFromDest = null;
@@ -21,7 +24,7 @@ export class DifferDomSerivce {
             const DOMSource: any = this.FromJson(JSON.parse(jsonFromSource));
             const DOMDest: any = this.FromJson(JSON.parse(jsonFromDest));
 
-            this.goDeepCompare(DOMSource, DOMDest);
+            this.deepCompare(DOMSource, DOMDest);
 
             return this.convertToHtml(DOMDest)
         }
@@ -45,54 +48,31 @@ export class DifferDomSerivce {
         return Object.assign(new DOMElement, d);
     }
 
-    private goDeepCompare(source: DOMElement, dest: DOMElement): void {
+    private deepCompare(source: DOMElement, dest: DOMElement): void {
         if (source != undefined)
         dest.Children.forEach( (child, index) => {
             if (child.Children.length !== 0) {
-                this.goDeepCompare(source.Children[index], child)
+                this.deepCompare(source.Children[index], child)
             }
             else {
                 const sourceElem = source.Children[index];
                 const destElem = child;
                 //Элемент был добавлен
                 if (sourceElem == undefined) {
-                    destElem.WasViewed = true;
-                    destElem.Attributes.push("style");
-                    destElem.Attributes.push("newelement");
-                    destElem.AttributesValue.push(`cursor: pointer; border: 4px solid green; padding: 10px`);
-                    destElem.AttributesValue.push("+")
+                    this.setAttribute(destElem, ["style","newelement"], [this.addedStyle, "+"]);
                 }
                 else {
                     if (destElem.TagName == sourceElem.TagName) {
                         //Элемент был изменен
                         if (sourceElem.TextContent != destElem.TextContent) {
-                            dest.WasViewed = true;
-                            source.WasViewed = true;
-                            destElem.WasViewed = true;
-                            sourceElem.WasViewed = true;
-                            destElem.Attributes.push("class");
-                            destElem.Attributes.push("style");
-                            destElem.Attributes.push("oldValue");
-                            destElem.AttributesValue.push("changedValue");
-                            destElem.AttributesValue.push(`cursor: pointer; border: 4px solid orange; padding: 10px`);
-                            destElem.AttributesValue.push(`${sourceElem.TextContent}`);
+                            this.setAttribute(destElem, ["class", "style", "oldValue"],["changedValue", this.changedStyle,`${sourceElem.TextContent}`]);
                         }
                     }
                     else {
                         //Старый элемент был удален, на его место был добавлен новый элемент
-                        source.WasViewed = true;
-                        sourceElem.WasViewed = true;
-                        sourceElem.Attributes.push("style");
-                        sourceElem.Attributes.push("deletedelement");
-                        sourceElem.AttributesValue.push(`cursor: pointer; border: 4px solid red; padding: 10px`);
-                        sourceElem.AttributesValue.push("-")
+                        this.setAttribute(sourceElem, ["style", "deletedelement"], [this.deletedStyle, "-"]);
+                        this.setAttribute(destElem, ["style", "newelement"], [this.addedStyle, "+"]);
                         dest.Children.unshift(sourceElem);
-                        dest.WasViewed = true;
-                        destElem.WasViewed = true;
-                        destElem.Attributes.push("style");
-                        destElem.Attributes.push("newelement");
-                        destElem.AttributesValue.push(`cursor: pointer; border: 4px solid green; padding: 10px`);
-                        destElem.AttributesValue.push("+")
                     }
                 }
             }
@@ -101,11 +81,7 @@ export class DifferDomSerivce {
                 if (dest.Children.length > source.Children.length) {
                     dest.Children.forEach( (destChild, index) => {
                         if (source.Children[index] === undefined) {
-                            destChild.WasViewed = true;
-                            destChild.Attributes.push("style");
-                            destChild.Attributes.push("newelement");
-                            destChild.AttributesValue.push(`cursor: pointer; border: 4px solid green; padding: 10px`);
-                            destChild.AttributesValue.push("+")
+                            this.setAttribute(destChild, ["style", "newelement"],[this.addedStyle, "+"]);
                         }
                     });
                 }
@@ -114,10 +90,7 @@ export class DifferDomSerivce {
                     source.Children.forEach( (sourceChild, index) => {
                         if (dest.Children[index] === undefined) {
                             sourceChild.WasViewed = true;
-                            sourceChild.Attributes.push("style");
-                            sourceChild.Attributes.push("deletedelement");
-                            sourceChild.AttributesValue.push(`cursor: pointer; border: 4px solid red; padding: 10px`);
-                            sourceChild.AttributesValue.push("-")
+                            this.setAttribute(sourceChild, ["style", "deletedelement"], [this.deletedStyle, "-"]);
                             dest.Children.push(sourceChild);
                         }
                     });
@@ -133,13 +106,11 @@ export class DifferDomSerivce {
                 let attributes = '';
                 child.Attributes.forEach((attr, index) => {
                     let equalsSign = '='
-                    const attrValue = child.AttributesValue[index].replace('"','');
-                    if (child.AttributesValue[index].includes('<') || child.AttributesValue[index].includes('>')) {
-                        child.AttributesValue[index] = '';
-                    }
+                    let quotesSing = '"';
                     if (child.AttributesValue[index] === ' ' || child.AttributesValue[index] ==='')
                         equalsSign = ''
-                    attributes += attr.replace(`"`, '') + `${equalsSign}` + `"${child.AttributesValue[index].replace('=', '')}" `;
+                        quotesSing = ''
+                    attributes += attr.replace(`"`, '') + `${equalsSign}` + `${quotesSing}${child.AttributesValue[index].replace('=', '')}${quotesSing} `;
                 });
                 if (child.Children.length !== 0) {
                     child.TextContent = '';
@@ -154,4 +125,11 @@ export class DifferDomSerivce {
     
         return result;
     };
+
+    private setAttribute(domElement: DOMElement, attributeName: string[], attributeValue: string[]): void {
+        attributeName.forEach( (name, valueIndex) => {
+            domElement.Attributes.push(name);
+            domElement.AttributesValue.push(attributeValue[valueIndex]);
+        })
+    }
 }
