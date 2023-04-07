@@ -29,7 +29,7 @@ export class DifferDomSerivce {
             return this.convertToHtml(DOMDest)
         }
         
-        return '';
+        return 'К сожалению, документы не удалось сравнить';
     }
 
     private markUpToJson = (e: Element): string =>

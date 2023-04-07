@@ -29,6 +29,16 @@ program
     
 const options = program.opts();
 
+const sourceFileJSdom = new JSDOM(loadFile('././test-pages/1-src.html'));
+const destFileJSdom = new JSDOM(loadFile('././test-pages/1-src.html'));
+
+const SourceBody = sourceFileJSdom.window.document.querySelector('body');
+const DestBody = destFileJSdom.window.document.querySelector('body');
+
+const differDomService = new DifferDomSerivce(SourceBody, DestBody);
+
+const final = differDomService.DOMHandler();
+
 if (options.compare) {
 
     const paths: string[] = options.compare as string[];
