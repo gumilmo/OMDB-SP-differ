@@ -11,8 +11,6 @@ import { Differ } from './services/differ-services/differ-file.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
 import path from 'path';
 import { JSDOM } from 'jsdom'
-import { plainToClass } from "class-transformer";
-import { json } from 'stream/consumers';
 import { DifferDomSerivce } from './services/differ-services/differ-dom.serivce'
 
 const beautify = require('beautify');
@@ -29,8 +27,8 @@ program
     
 const options = program.opts();
 
-const sourceFileJSdom = new JSDOM(loadFile('././test-pages/1-src.html'));
-const destFileJSdom = new JSDOM(loadFile('././test-pages/1-src.html'));
+const sourceFileJSdom = new JSDOM(loadFile('././test-pages/2-src.html').toString());
+const destFileJSdom = new JSDOM(loadFile('././test-pages/2-dst.html').toString());
 
 const SourceBody = sourceFileJSdom.window.document.querySelector('body');
 const DestBody = destFileJSdom.window.document.querySelector('body');
