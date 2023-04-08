@@ -68,7 +68,7 @@ if (options.compare) {
 
     let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
     
-    let final = '<body>';
+    let final = '<body>1';
     final += differDomService.DOMHandler();
     final += `<script type="text/javascript" src="./interact.js"></script>`
     final += '</body>';
