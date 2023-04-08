@@ -48,53 +48,51 @@ export class DifferDomSerivce {
         return Object.assign(new DOMElement, d);
     }
 
+
+    //ПРОВЕРИТЬ КАК РАБОТАЕТ С Continue/Return
     private deepCompare(source: DOMElement, dest: DOMElement): void {
         if (source != undefined)
         dest.Children.forEach( (child, index) => {
             if (child.Children.length !== 0) {
                 this.deepCompare(source.Children[index], child)
+                return;
+            }
+            
+            const sourceElem = source.Children[index];
+            const destElem = child;
+            //Элемент был добавлен
+            if (sourceElem == undefined) {
+                this.setAttribute(destElem, ["style","newelement"], [this.addedStyle, "+"]);
+                return;
+            }
+            if (destElem.TagName == sourceElem.TagName) {
+                //Элемент был изменен
+                if (sourceElem.TextContent != destElem.TextContent) {
+                    this.setAttribute(destElem, ["class", "style", "oldValue"],["changedValue", this.changedStyle,`${sourceElem.TextContent}`]);
+                }
             }
             else {
-                const sourceElem = source.Children[index];
-                const destElem = child;
-                //Элемент был добавлен
-                if (sourceElem == undefined) {
-                    this.setAttribute(destElem, ["style","newelement"], [this.addedStyle, "+"]);
-                }
-                else {
-                    if (destElem.TagName == sourceElem.TagName) {
-                        //Элемент был изменен
-                        if (sourceElem.TextContent != destElem.TextContent) {
-                            this.setAttribute(destElem, ["class", "style", "oldValue"],["changedValue", this.changedStyle,`${sourceElem.TextContent}`]);
-                        }
-                    }
-                    else {
-                        //Старый элемент был удален, на его место был добавлен новый элемент
-                        this.setAttribute(sourceElem, ["style", "deletedelement"], [this.deletedStyle, "-"]);
-                        this.setAttribute(destElem, ["style", "newelement"], [this.addedStyle, "+"]);
-                        dest.Children.unshift(sourceElem);
-                    }
-                }
+                //Старый элемент был удален, на его место был добавлен новый элемент
+                this.setAttribute(sourceElem, ["style", "deletedelement"], [this.deletedStyle, "-"]);
+                this.setAttribute(destElem, ["style", "newelement"], [this.addedStyle, "+"]);
+                dest.Children.unshift(sourceElem);
             }
-            if (dest.Children.length != source.Children.length) {
-                //Элементы добавлены из новой версии верстки
-                if (dest.Children.length > source.Children.length) {
-                    dest.Children.forEach( (destChild, index) => {
-                        if (source.Children[index] === undefined) {
-                            this.setAttribute(destChild, ["style", "newelement"],[this.addedStyle, "+"]);
-                        }
-                    });
-                }
-                else {
-                    //Элементы удалены из старой версии верстки
-                    source.Children.forEach( (sourceChild, index) => {
-                        if (dest.Children[index] === undefined) {
-                            sourceChild.WasViewed = true;
-                            this.setAttribute(sourceChild, ["style", "deletedelement"], [this.deletedStyle, "-"]);
-                            dest.Children.push(sourceChild);
-                        }
-                    });
-                }
+            //Элементы добавлены из новой версии верстки
+            if (dest.Children.length > source.Children.length) {
+                dest.Children.forEach( (destChild, index) => {
+                    if (source.Children[index] === undefined) {
+                        this.setAttribute(destChild, ["style", "newelement"],[this.addedStyle, "+"]);
+                    }
+                });
+            }
+            else if (dest.Children.length < source.Children.length) {
+                //Элементы удалены из старой версии верстки
+                source.Children.forEach( (sourceChild, index) => {
+                    if (dest.Children[index] === undefined) {
+                        this.setAttribute(sourceChild, ["style", "deletedelement"], [this.deletedStyle, "-"]);
+                        dest.Children.push(sourceChild);
+                    }
+                });
             }
         });
     }
@@ -107,7 +105,7 @@ export class DifferDomSerivce {
                 child.Attributes.forEach((attr, index) => {
                     let equalsSign = '='
                     let quotesSing = '"';
-                    if (child.AttributesValue[index] === ' ' || child.AttributesValue[index] ==='')
+                    if (child.AttributesValue[index] === ' ' || child.AttributesValue[index] === '')
                         equalsSign = ''
                         quotesSing = ''
                     attributes += attr.replace(`"`, '') + `${equalsSign}` + `${quotesSing}${child.AttributesValue[index].replace('=', '')}${quotesSing} `;
