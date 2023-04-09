@@ -21,8 +21,8 @@ program
     
 const options = program.opts();
 
-const sourceFileJSdom = new JSDOM(loadFile('././test-pages/2-src.html'));
-const destFileJSdom = new JSDOM(loadFile('././test-pages/2-dst.html'));
+const sourceFileJSdom = new JSDOM(loadFile('././test-pages/3-src.html'));
+const destFileJSdom = new JSDOM(loadFile('././test-pages/3-dst.html'));
 
 const SourceBody = sourceFileJSdom.window.document.querySelector('body');
 const DestBody = destFileJSdom.window.document.querySelector('body');
@@ -39,7 +39,7 @@ let final = '<body>';
 
 const fullContent = styles + final;
 
-fs.writeFileSync(__dirname + `/compareresult.html`, fullContent);
+createResultHtmlDomDiffer(styles += final, 0)
 
 if (options.compare) {
 
@@ -48,19 +48,22 @@ if (options.compare) {
        throw new Error(`Не указан путь(и) до файлов ${paths}`);
     }
 
-    const source: ComparableDocument = new ComparableDocument(
-        loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    )
+    // const source: ComparableDocument = new ComparableDocument(
+    //     loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    // )
     
-    const dest: ComparableDocument = new ComparableDocument(
-        loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    )
+    // const dest: ComparableDocument = new ComparableDocument(
+    //     loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    // )
     
-    const differ = new Differ(source, dest);
+    // const differ = new Differ(source, dest);
 
-    var lines = differ.getViewableLines();
-    var timeAppEnd = new Date().getTime();
-    createResultHtmlFileDiffer(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
+    // var lines = differ.getViewableLines();
+    // var timeAppEnd = new Date().getTime();
+
+    // console.log(lines);
+
+    // createResultHtmlFileDiffer(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
 
     const sourceFileJSdom = new JSDOM(loadFile(paths[0]));
     const destFileJSdom = new JSDOM(loadFile(paths[1]));
@@ -72,14 +75,13 @@ if (options.compare) {
 
     let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
     
-    let final = '<html>';
-    final += '<body>';
+    let final = '<body>';
     final += differDomService.DOMHandler();
     final += `<script type="text/javascript" src="./interact.js"></script>`
     final += '</body>';
     final += '</html>';
 
-    createResultHtmlDomDiffer(styles += final, timeAppEnd)
+    createResultHtmlDomDiffer(styles += final, 0)
 }
 else {
     program.help();
