@@ -21,25 +21,17 @@ program
     
 const options = program.opts();
 
-const sourceFileJSdom = new JSDOM(loadFile('././test-pages/3-src.html'));
-const destFileJSdom = new JSDOM(loadFile('././test-pages/3-dst.html'));
+const sourceFileJSdom1 = new JSDOM(loadFile('././test-pages/3-src.html'));
+const destFileJSdom1 = new JSDOM(loadFile('././test-pages/3-dst.html'));
 
-const SourceBody = sourceFileJSdom.window.document.querySelector('body');
-const DestBody = destFileJSdom.window.document.querySelector('body');
+const SourceBody1 = sourceFileJSdom1.window.document.querySelector('body');
+const DestBody1 = destFileJSdom1.window.document.querySelector('body');
 
-const differDomService = new DifferDomSerivce(SourceBody, DestBody);
+const differDomService1 = new DifferDomSerivce(SourceBody1, DestBody1);
 
-let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
+let styles1 = destFileJSdom1.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
 
-let final = '<body>';
-    final += differDomService.DOMHandler();
-    final += `<script type="text/javascript" src="./interact.js"></script>`
-    final += '</body>';
-    final += '</html>';
-
-const fullContent = styles + final;
-
-createResultHtmlDomDiffer(styles += final, 0)
+const final1 = differDomService1.DOMHandler();
 
 if (options.compare) {
 
@@ -59,7 +51,7 @@ if (options.compare) {
     // const differ = new Differ(source, dest);
 
     // var lines = differ.getViewableLines();
-    // var timeAppEnd = new Date().getTime();
+    var timeAppEnd = new Date().getTime();
 
     // console.log(lines);
 
@@ -73,7 +65,8 @@ if (options.compare) {
 
     const differDomService = new DifferDomSerivce(SourceBody, DestBody);
 
-    let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
+    let styles = '<!DOCTYPE html> <html>';
+    styles += destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
     
     let final = '<body>';
     final += differDomService.DOMHandler();
@@ -81,7 +74,7 @@ if (options.compare) {
     final += '</body>';
     final += '</html>';
 
-    createResultHtmlDomDiffer(styles += final, 0)
+    createResultHtmlDomDiffer(styles += final, timeAppEnd)
 }
 else {
     program.help();
