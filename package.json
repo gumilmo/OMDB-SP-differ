@@ -10,8 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "beautify": "^0.0.8",
-    "cheerio": "^1.0.0-rc.12",
     "class-transformer": "^0.5.1",
     "commander": "^10.0.0",
     "figlet": "^1.5.2",

@@ -15,15 +15,15 @@ export class DifferDomSerivce {
 
 
     public DOMHandler(): string {
-        let jsonFromDest = null;
+        let jsonFromDest =  null;
         let jsonFromSource = null;
 
         if (this.DomSource != null && this.DomDest != null) {
             jsonFromSource = this.markUpToJson(this.DomSource);
             jsonFromDest = this.markUpToJson(this.DomDest);
             
-            const DOMSource: any = this.FromJson(JSON.parse(jsonFromSource));
-            const DOMDest: any = this.FromJson(JSON.parse(jsonFromDest));
+            const DOMSource: any = this.buildDOMElement(JSON.parse(jsonFromSource));
+            const DOMDest: any = this.buildDOMElement(JSON.parse(jsonFromDest));
 
             this.deepCompare(DOMSource, DOMDest);
 
@@ -45,12 +45,12 @@ export class DifferDomSerivce {
         Children: Array.from(element.children, this.ElementToDOMElement),
     });
 
-    private FromJson(d: Object): Object {
+    private buildDOMElement(d: Object): Object {
         return Object.assign(new DOMElement, d);
     }
 
     private deepCompare(source: DOMElement, dest: DOMElement): void {
-        if (source != undefined)
+        if (source == undefined) return;
         dest.Children.forEach( (child, index) => {
             if (child.Children.length !== 0) {
                 this.deepCompare(source.Children[index], child)
@@ -61,40 +61,43 @@ export class DifferDomSerivce {
                 //Элемент был добавлен
                 if (sourceElem == undefined) {
                     this.setAttribute(destElem, ["style", TrackedChanges.Added], [DifferDomSerivce.addedStyle, "+"]);
+                    return;
+                }
+                if (destElem.TagName == sourceElem.TagName) {
+                    //Элемент был изменен
+                    if (sourceElem.TextContent != destElem.TextContent) {
+                        this.setAttribute(destElem, 
+                            ["class", "style", TrackedChanges.Changed], 
+                            ["changedValue", DifferDomSerivce.changedStyle, `${sourceElem.TextContent}`]);
+                        return;
+                    }
                 }
                 else {
-                    if (destElem.TagName == sourceElem.TagName) {
-                        //Элемент был изменен
-                        if (sourceElem.TextContent != destElem.TextContent) {
-                            this.setAttribute(destElem, 
-                                ["class", "style", TrackedChanges.Changed], 
-                                ["changedValue", DifferDomSerivce.changedStyle, `${sourceElem.TextContent}`]);
-                        }
-                    }
-                    else {
-                        //Старый элемент был удален, на его место был добавлен новый элемент
-                        this.setAttribute(sourceElem, ["style", TrackedChanges.Deleted], [DifferDomSerivce.deletedStyle, "+"]);
-                        dest.Children.unshift(sourceElem);
-                        this.setAttribute(destElem, ["style", TrackedChanges.Added], [DifferDomSerivce.addedStyle, "+"]);
-                    }
+                    //Старый элемент был удален, на его место был добавлен новый элемент
+                    this.setAttribute(sourceElem, ["style", TrackedChanges.Deleted], [DifferDomSerivce.deletedStyle, "+"]);
+                    dest.Children.unshift(sourceElem);
+                    this.setAttribute(destElem, ["style", TrackedChanges.Added], [DifferDomSerivce.addedStyle, "+"]);
+                    return;
                 }
             }
-            //Элементы добавлены в новой версии верстки
-            if (dest.Children.length > source.Children.length) {
-                dest.Children.forEach( (destChild, index) => {
-                    if (source.Children[index] === undefined) {
-                        this.setAttribute(destChild, ["style", TrackedChanges.Added], [DifferDomSerivce.addedStyle, "+"]);
-                    }
-                });
-            }
-            //Элементы удалены из старой версии верстки
-            else if (dest.Children.length < source.Children.length)  {
-                source.Children.forEach( (sourceChild, index) => {
-                    if (dest.Children[index] === undefined) {
-                        this.setAttribute(sourceChild, ["style", TrackedChanges.Deleted], [DifferDomSerivce.deletedStyle, "+"]);
-                        dest.Children.push(sourceChild);
-                    }
-                });
+            if (dest.Children.length !== source.Children.length) {
+                //Элементы добавлены в новой версии верстки
+                if (dest.Children.length > source.Children.length) {
+                    dest.Children.forEach( (destChild, index) => {
+                        if (source.Children[index] === undefined) {
+                            this.setAttribute(destChild, ["style", TrackedChanges.Added], [DifferDomSerivce.addedStyle, "+"]);
+                        }
+                    });
+                }
+                //Элементы удалены из старой версии верстки
+                else if (source.Children.length > dest.Children.length)  {
+                    source.Children.forEach( (sourceChild, index) => {
+                        if (dest.Children[index] === undefined) {
+                            this.setAttribute(sourceChild, ["style", TrackedChanges.Deleted], [DifferDomSerivce.deletedStyle, "+"]);
+                            dest.Children.push(sourceChild);
+                        }
+                    });
+                }
             }
         });
     }
