@@ -1,9 +1,9 @@
 import { Command, AddHelpTextPosition, OutputConfiguration } from 'commander';
 import * as fs from 'fs';
 import { readFileSync } from 'fs';
-import { ComparableDocument } from './models/comparable-document.model';
-import { Line } from './models/line.model';
-import { ViewableLine } from './models/viewable-line.model';
+import { ComparableDocument } from './models/file-differ.models/comparable-document.model';
+import { Line } from './models/file-differ.models/line.model';
+import { ViewableLine } from './models/file-differ.models/viewable-line.model';
 import { ConsolePrinter } from './services/console-printer.service';
 import { Differ } from './services/differ-services/differ-file.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
