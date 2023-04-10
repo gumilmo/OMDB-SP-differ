@@ -21,8 +21,8 @@ program
     
 const options = program.opts();
 
-const sourceFileJSdom1 = new JSDOM(loadFile('././test-pages/5-src.html'));
-const destFileJSdom1 = new JSDOM(loadFile('././test-pages/5-dst.html'));
+const sourceFileJSdom1 = new JSDOM(loadFile('././test-pages/4-src.html'));
+const destFileJSdom1 = new JSDOM(loadFile('././test-pages/4-dst.html'));
 
 const SourceBody1 = sourceFileJSdom1.window.document.querySelector('body');
 const DestBody1 = destFileJSdom1.window.document.querySelector('body');
