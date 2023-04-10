@@ -68,17 +68,17 @@ export class DifferDomSerivce {
                     if (sourceElem.TextContent != destElem.TextContent) {
                         this.setAttribute(destElem, 
                             ["class", "style", TrackedChanges.Changed], 
-                            ["changedValue", DifferDomSerivce.changedStyle, `${sourceElem.TextContent}`]);
+                            ["changedValue", DifferDomSerivce.changedStyle, `${sourceElem.TextContent?.replaceAll(`"`, `'`)}`]);
                         return;
                     }
                 }
-                else {
-                    //Старый элемент был удален, на его место был добавлен новый элемент
-                    this.setAttribute(sourceElem, ["style", TrackedChanges.Deleted], [DifferDomSerivce.deletedStyle, "+"]);
-                    dest.Children.unshift(sourceElem);
-                    this.setAttribute(destElem, ["style", TrackedChanges.Added], [DifferDomSerivce.addedStyle, "+"]);
-                    return;
-                }
+                // else {
+                //     //Старый элемент был удален, на его место был добавлен новый элемент
+                //     this.setAttribute(sourceElem, ["style", TrackedChanges.Deleted], [DifferDomSerivce.deletedStyle, "+"]);
+                //     dest.Children.unshift(sourceElem);
+                //     this.setAttribute(destElem, ["style", TrackedChanges.Added], [DifferDomSerivce.addedStyle, "+"]);
+                //     return;
+                // }
             }
             if (dest.Children.length !== source.Children.length) {
                 //Элементы добавлены в новой версии верстки

@@ -21,17 +21,21 @@ program
     
 const options = program.opts();
 
-const sourceFileJSdom1 = new JSDOM(loadFile('././test-pages/3-src.html'));
-const destFileJSdom1 = new JSDOM(loadFile('././test-pages/3-dst.html'));
+const sourceFileJSdom1 = new JSDOM(loadFile('././test-pages/5-src.html'));
+const destFileJSdom1 = new JSDOM(loadFile('././test-pages/5-dst.html'));
 
 const SourceBody1 = sourceFileJSdom1.window.document.querySelector('body');
 const DestBody1 = destFileJSdom1.window.document.querySelector('body');
 
 const differDomService1 = new DifferDomSerivce(SourceBody1, DestBody1);
 
-let styles1 = destFileJSdom1.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
+let styles1 = '<!DOCTYPE html><html><head>';
+styles1 += destFileJSdom1.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
 
-const final1 = differDomService1.DOMHandler();
+let final1 = differDomService1.DOMHandler();
+final1 += `<script type="text/javascript" src="./interact.js"></script>`
+
+fs.writeFileSync(__dirname + `/result.html`, styles1+final1);
 
 if (options.compare) {
 
