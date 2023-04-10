@@ -1,22 +1,14 @@
 import { Command, AddHelpTextPosition, OutputConfiguration } from 'commander';
-import { trace } from 'console';
-import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import { readFileSync } from 'fs';
-import { ComparableDocument } from './models/comparable-document.model';
-import { Line } from './models/line.model';
-import { ViewableLine } from './models/viewable-line.model';
+import { ComparableDocument } from './models/file-differ.models/comparable-document.model';
+import { Line } from './models/file-differ.models/line.model';
+import { ViewableLine } from './models/file-differ.models/viewable-line.model';
 import { ConsolePrinter } from './services/console-printer.service';
-import { Differ } from './services/differ.service';
+import { Differ } from './services/differ-services/differ-file.service';
 import {HtmlGeneratorService} from './services/html-generator.service'
-import path from 'path';
 import { JSDOM } from 'jsdom'
-import { plainToClass } from "class-transformer";
-import { json } from 'stream/consumers';
-import { DifferDomSerivce } from './services/differ-dom.serivce'
-
-const beautify = require('beautify');
-
+import { DifferDomSerivce } from './services/differ-services/differ-dom.serivce'
 
 var timeAppStart = new Date().getTime();
 
@@ -29,6 +21,18 @@ program
     
 const options = program.opts();
 
+const sourceFileJSdom1 = new JSDOM(loadFile('././test-pages/3-src.html'));
+const destFileJSdom1 = new JSDOM(loadFile('././test-pages/3-dst.html'));
+
+const SourceBody1 = sourceFileJSdom1.window.document.querySelector('body');
+const DestBody1 = destFileJSdom1.window.document.querySelector('body');
+
+const differDomService1 = new DifferDomSerivce(SourceBody1, DestBody1);
+
+let styles1 = destFileJSdom1.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
+
+const final1 = differDomService1.DOMHandler();
+
 if (options.compare) {
 
     const paths: string[] = options.compare as string[];
@@ -36,19 +40,22 @@ if (options.compare) {
        throw new Error(`Не указан путь(и) до файлов ${paths}`);
     }
 
-    const source: ComparableDocument = new ComparableDocument(
-        loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    )
+    // const source: ComparableDocument = new ComparableDocument(
+    //     loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    // )
     
-    const dest: ComparableDocument = new ComparableDocument(
-        loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    )
+    // const dest: ComparableDocument = new ComparableDocument(
+    //     loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    // )
     
-    const differ = new Differ(source, dest);
+    // const differ = new Differ(source, dest);
 
-    var lines = differ.getViewableLines();
+    // var lines = differ.getViewableLines();
     var timeAppEnd = new Date().getTime();
-    createResultHtmlFileDiffer(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
+
+    // console.log(lines);
+
+    // createResultHtmlFileDiffer(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
 
     const sourceFileJSdom = new JSDOM(loadFile(paths[0]));
     const destFileJSdom = new JSDOM(loadFile(paths[1]));
@@ -58,7 +65,8 @@ if (options.compare) {
 
     const differDomService = new DifferDomSerivce(SourceBody, DestBody);
 
-    let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
+    let styles = '<!DOCTYPE html> <html>';
+    styles += destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
     
     let final = '<body>';
     final += differDomService.DOMHandler();

@@ -6,3 +6,9 @@ export class DOMElement {
     WasViewed: boolean;
     Children: DOMElement[];
 }
+
+export enum TrackedChanges {
+    Added = "newelement",
+    Deleted = "deletedelement",
+    Changed = "changedelement"
+}
