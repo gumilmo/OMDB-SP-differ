@@ -9,8 +9,14 @@ export class DOMElement {
 }
 
 export class ComparableHtml {
-    Styles: string;
-    Body: string;
+
+    constructor (styles: string | undefined, body: string) {
+        this.Styles = styles;
+        this.Body = body;
+    }
+
+    public Styles: string | undefined;
+    public Body: string;
 }
 
 export enum TrackedChanges {
