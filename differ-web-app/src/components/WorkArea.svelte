@@ -55,11 +55,34 @@ let resultHtml;
     
     {@html resultHtml} -->
     <div class="omdb-work-area-wrapper">
-        <div class="omdb-buttons-area"></div>
-
+        <div class="omdb-buttons-area-wrapper">
+            <div class="omd-button-area">
+                <button>Статистика</button>
+                <button>Диффер вёрстки</button>
+                <button>Диффер текста</button>
+                <button>Диффер файла</button>
+            </div>
+        </div>
         <div class="omdb-main-area">
-            <div class="omdb-statistics">
+            <div class="omdb-statistics-wrapper">
+                <div class="omdb-statistics">
+                    <div class="omdb-stat-block omdb-files-name">
     
+                    </div>
+                    <div class="omdb-stat-block omdb-modified-stat">
+
+                    </div>
+                    <div class="omdb-stat-block omdb-added-stat">
+
+                    </div>
+                    <div class="omdb-stat-block omdb-delted-stat">
+
+                    </div>
+                    <div class="omdb-stat-block omdb-time-stat">
+
+                    </div>
+                </div>
+
             </div>
             <div class="omdb-main-view-wrapper">
                 <div class="omdb-main-view">
@@ -75,7 +98,8 @@ let resultHtml;
         background-color: bisque;
         min-height: 100%;
         width: 100%;
-        display: block;
+        padding-top: 10px;
+        padding-bottom: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -88,23 +112,38 @@ let resultHtml;
         background-color: aqua;
     }
 
-    .omdb-buttons-area {
+    .omdb-buttons-area-wrapper {
         width: 100%;
-        height: 180px;
+        height: 110px;
         background-color: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .omd-button-area {
+        height: 90%;
+        width: 99%;
+        background-color: greenyellow;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
     }
 
     .omdb-main-area {
-        height: 700px;
+        min-height: 900px;
         width: 100%;
         background-color: rgb(255, 54, 148);
         display: flex;
     }
 
-    .omdb-statistics {
+    .omdb-statistics-wrapper {
         min-height: 100%;
         background-color: cadetblue;
         width: 25%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .omdb-main-view-wrapper {
@@ -120,5 +159,33 @@ let resultHtml;
         width: 100%;
         min-height: 100%;
         background-color: tomato;
+    }
+
+    .omdb-statistics {
+        width: 95%;
+        height: 99%;
+        background-color: rgb(221, 221, 221);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-flow: column;
+    }
+
+    .omdb-stat-block {
+        height: 25%;
+        width: 100%;
+        background-color: blueviolet;
+        margin: 1px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .omdb-files-name {
+        height: 15%;
+        margin-top: 0px;
+    }
+
+    .omdb-time-stat {
+        height: 10%;
     }
 </style>
