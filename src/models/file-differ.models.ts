@@ -1,4 +1,13 @@
-import { Line } from "./line.model";
+export class Line {
+
+    constructor(line: string, lineIndex: number) {
+        this.LineValue = line;
+        this.LineIndex = lineIndex;
+    }
+
+    LineValue: string;
+    LineIndex: number;
+}
 
 export class ViewableLine {
 
@@ -43,4 +52,13 @@ export class ViewableLine {
         return this.EditType === "deleted" ? "deleted" : this.EditType === "inserted" ? "added" : "equals"
     }
 
+}
+
+export class ComparableDocument {
+
+    constructor (lines: Line[] ) {
+        this.Lines = lines;
+    }
+
+    Lines: Line[];
 }

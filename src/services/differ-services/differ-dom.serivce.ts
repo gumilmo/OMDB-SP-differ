@@ -1,4 +1,4 @@
-import { ChangeFlag, DOMElement, TrackedChanges } from "../../models/dom-element.model";
+import { ChangeFlag, DOMElement, TrackedChanges } from "../../models/dom-element.models";
 
 export class DifferDomSerivce {
     constructor (domSource: HTMLBodyElement | null, domDest: HTMLBodyElement | null) {

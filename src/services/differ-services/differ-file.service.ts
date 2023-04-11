@@ -1,5 +1,5 @@
-import { ComparableDocument } from "../../models/file-differ.models/comparable-document.model";
-import { ViewableLine } from "../../models/file-differ.models/viewable-line.model";
+import { ComparableDocument, ViewableLine } from "../../models/file-differ.models";
+
 
 export class Differ {
 
