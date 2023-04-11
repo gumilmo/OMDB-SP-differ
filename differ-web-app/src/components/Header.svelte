@@ -7,7 +7,7 @@
     header {
         background-color: blue;
         width: 100%;
-        height: 200px;
+        height: 90px;
         color: white;
     }
 </style>
