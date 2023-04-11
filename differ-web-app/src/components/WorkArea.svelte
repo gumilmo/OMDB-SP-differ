@@ -54,13 +54,71 @@ let resultHtml;
     </div>
     
     {@html resultHtml} -->
+    <div class="omdb-work-area-wrapper">
+        <div class="omdb-buttons-area"></div>
+
+        <div class="omdb-main-area">
+            <div class="omdb-statistics">
+    
+            </div>
+            <div class="omdb-main-view-wrapper">
+                <div class="omdb-main-view">
+
+                </div>
+            </div>
+        </div>
+    </div>
 </workarea>
 
 <style>
     workarea {
         background-color: bisque;
-        height: 900px;
+        min-height: 100%;
         width: 100%;
         display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-flow: column;
+    }
+
+    .omdb-work-area-wrapper {
+        min-height: 98%;
+        width: 99%;
+        background-color: aqua;
+    }
+
+    .omdb-buttons-area {
+        width: 100%;
+        height: 180px;
+        background-color: black;
+    }
+
+    .omdb-main-area {
+        height: 700px;
+        width: 100%;
+        background-color: rgb(255, 54, 148);
+        display: flex;
+    }
+
+    .omdb-statistics {
+        min-height: 100%;
+        background-color: cadetblue;
+        width: 25%;
+    }
+
+    .omdb-main-view-wrapper {
+        width: 100%;
+        min-height: 100%;
+        background-color: coral;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .omdb-main-view {
+        width: 100%;
+        min-height: 100%;
+        background-color: tomato;
     }
 </style>
