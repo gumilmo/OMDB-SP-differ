@@ -23,6 +23,15 @@ app.listen(port, () => {
    console.log(`Сервер запущен на порту ${port}`);
 });
 
+const cors=require("cors");
+const corsOptions ={
+   origin:'*', 
+   credentials:true,
+   optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions)) // Use this after the variable declaration
+
 app.post('/api/compare' , async (req: any, res: any) => {
 
     var files =  req.body;
@@ -39,7 +48,7 @@ app.post('/api/compare' , async (req: any, res: any) => {
     const differDomService = new DifferDomSerivce(SourceBody, DestBody);
 
     let styles = '<!DOCTYPE html> <html>';
-    styles += destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0].replace('height: calc(100% - 32px)', '');
+    styles += destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
     
     let final = '<body>';
     final += differDomService.DOMHandler();
@@ -70,8 +79,6 @@ app.post('/api/compare-text' , async (req: any, res: any) => {
 
     var lines = differ.getViewableLines();
     var timeAppEnd = new Date().getTime();
-
-    console.log(lines);
 
     var result = HtmlGeneratorService.createHtmlView(lines, 0, timeAppEnd, "paths[0]"," paths[1]");
       res.send(result);
