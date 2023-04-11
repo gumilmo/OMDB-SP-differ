@@ -1,10 +1,9 @@
 import { JSDOM } from 'jsdom'
 import { DifferDomSerivce } from '../services/differ-services/differ-dom.serivce';
-import { ComparableDocument } from '../models/file-differ.models/comparable-document.model';
 import { Differ } from '../services/differ-services/differ-file.service';
 import { HtmlGeneratorService } from '../services/html-generator.service';
-import { Line } from '../models/file-differ.models/line.model';
-import { ComparableHtml } from '../models/dom-element.model';
+import { ComparableHtml } from '../models/dom-element.models';
+import { ComparableDocument, Line } from '../models/file-differ.models';
 
 
 export class MainAppController {

@@ -1,4 +1,5 @@
-import { ViewableLine } from "../models/file-differ.models/viewable-line.model";
+import { ViewableLine } from "../models/file-differ.models";
+
 
 export class ConsolePrinter {
 

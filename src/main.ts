@@ -1,14 +1,13 @@
 import { Command, AddHelpTextPosition, OutputConfiguration } from 'commander';
 import * as fs from 'fs';
 import { readFileSync } from 'fs';
-import { ComparableDocument } from './models/file-differ.models/comparable-document.model';
-import { Line } from './models/file-differ.models/line.model';
-import { ViewableLine } from './models/file-differ.models/viewable-line.model';
+import { ViewableLine } from './models/file-differ.models';
 import { ConsolePrinter } from './services/console-printer.service';
 import { Differ } from './services/differ-services/differ-file.service';
-import {HtmlGeneratorService} from './services/html-generator.service'
 import { JSDOM } from 'jsdom'
 import { DifferDomSerivce } from './services/differ-services/differ-dom.serivce'
+import { HtmlGeneratorService } from './services/html-generator.service';
+import { ComparableDocument, Line } from './models/file-differ.models';
 
 var timeAppStart = new Date().getTime();
 
@@ -44,22 +43,22 @@ if (options.compare) {
        throw new Error(`Не указан путь(и) до файлов ${paths}`);
     }
 
-    // const source: ComparableDocument = new ComparableDocument(
-    //     loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    // )
+    const source: ComparableDocument = new ComparableDocument(
+        loadFile(paths[0]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    )
     
-    // const dest: ComparableDocument = new ComparableDocument(
-    //     loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
-    // )
+    const dest: ComparableDocument = new ComparableDocument(
+        loadFile(paths[1]).toString().split('\n').map( (line, index) => new Line(line.replace('\r', ''), index+1) )
+    )
     
-    // const differ = new Differ(source, dest);
+    const differ = new Differ(source, dest);
 
-    // var lines = differ.getViewableLines();
+    var lines = differ.getViewableLines();
     var timeAppEnd = new Date().getTime();
 
     // console.log(lines);
 
-    // createResultHtmlFileDiffer(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
+    createResultHtmlFileDiffer(HtmlGeneratorService.createHtmlView(lines, timeAppStart, timeAppEnd, paths[0], paths[1]),lines,timeAppEnd);
 
     const sourceFileJSdom = new JSDOM(loadFile(paths[0]));
     const destFileJSdom = new JSDOM(loadFile(paths[1]));
