@@ -8,6 +8,11 @@ export class DOMElement {
     ChangeFlag: number
 }
 
+export class ComparableHtml {
+    Styles: string;
+    Body: string;
+}
+
 export enum TrackedChanges {
     Added = "newelement",
     Deleted = "deletedelement",
