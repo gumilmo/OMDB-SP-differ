@@ -4,6 +4,7 @@ import { ComparableDocument } from '../models/file-differ.models/comparable-docu
 import { Differ } from '../services/differ-services/differ-file.service';
 import { HtmlGeneratorService } from '../services/html-generator.service';
 import { Line } from '../models/file-differ.models/line.model';
+import { ComparableHtml } from '../models/dom-element.model';
 
 
 export class MainAppController {
@@ -21,17 +22,13 @@ export class MainAppController {
         const DestBody = destFileJSdom.window.document.querySelector('body');
     
         const differDomService = new DifferDomSerivce(SourceBody, DestBody);
-    
-        let styles = '<!DOCTYPE html> <html>';
-        styles += destFileJSdom.window.document.querySelector('html')?.innerHTML.split("<body")[0];
+
+        let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML;
+        styles = styles?.substring(styles.indexOf("<head>")+6, styles.lastIndexOf("</head>"));
         
-        let final = '<body>';
-        final += differDomService.DOMHandler();
-        final += `<script type="text/javascript" src="./interact.js"></script>`
-        final += '</body>';
-        final += '</html>';
-        console.log(final)
-        var result = styles + final
+        const mainContent = differDomService.DOMHandler();
+
+        const result = new ComparableHtml(styles, mainContent);
 
         res.send(result);
     };
@@ -56,7 +53,6 @@ export class MainAppController {
         var lines = differ.getViewableLines();
         var timeAppEnd = new Date().getTime();
      
-        var result = HtmlGeneratorService.createHtmlView(lines, 0, timeAppEnd, "paths[0]"," paths[1]");
-        res.send(result);
+        res.send(lines);
      };
 }
