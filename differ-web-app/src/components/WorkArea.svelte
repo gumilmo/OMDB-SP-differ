@@ -144,7 +144,7 @@
                 <div class="omdb-main-inputs">
                     <button on:click={comapreDomWithStyles(true)}>Диффер вёрстки</button>
                     <button on:click={comapreDomWithStyles(false)}>Диффер текста</button>
-                    <button on:click={goToFileDiffer}>Диффер файла</button>
+                    <button on:click={comapreFiles}>Диффер файла</button>
                 </div>
             </div>
         </div>
