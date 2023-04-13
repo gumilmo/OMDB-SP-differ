@@ -10,13 +10,15 @@ export class DOMElement {
 
 export class ComparableHtml {
 
-    constructor (styles: string | undefined, body: string) {
+    constructor (styles: string | undefined, body: string, time: number) {
         this.Styles = styles;
         this.Body = body;
+        this.Time = time;
     }
 
     public Styles: string | undefined;
     public Body: string;
+    public Time: number;
 }
 
 export enum TrackedChanges {
