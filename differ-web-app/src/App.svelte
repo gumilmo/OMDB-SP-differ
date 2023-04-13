@@ -14,6 +14,7 @@
 </footer>
 
 <style>
+    
     header {
         background-color: blue;
         width: 100%;
