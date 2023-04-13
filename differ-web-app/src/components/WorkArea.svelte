@@ -1,5 +1,36 @@
 <script>
-let resultHtml;
+    import UploadFiles from "./UploadFiles.svelte";
+    import DomCompare from "./DomCompare.svelte";
+    import FileCompare from "./FileCompare.svelte";
+
+    const views = [UploadFiles, DomCompare, FileCompare];
+
+    let mainView = null;
+    let currentView = 0;
+
+    function updateMainView() {
+        mainView = views[currentView];
+    }
+
+    function goToUpload() {
+        currentView = 0
+        updateMainView()
+    }
+
+    function goToDomDiffer() {
+        currentView = 1
+        updateMainView()
+    }
+
+    function goToFileDiffer() {
+        currentView = 2
+        updateMainView()
+    }
+
+    updateMainView()
+
+
+    let resultHtml;
     let isTextComare = false;
 
     async function castHtmlFileToTextPlain(file) {
@@ -35,6 +66,17 @@ let resultHtml;
 
         resultHtml = await response.text();
     }
+
+    function toggleStatistics() {
+        const menu = document.getElementById("stat-menu");
+        if (menu.style.width >= "24%") {
+            menu.style.width = "0%"
+        }
+        else {
+            menu.style.width = "25%"
+        }
+    }
+
 </script>
 
 <workarea>
@@ -57,14 +99,19 @@ let resultHtml;
     <div class="omdb-work-area-wrapper">
         <div class="omdb-buttons-area-wrapper">
             <div class="omd-button-area">
-                <button>Статистика</button>
-                <button>Диффер вёрстки</button>
-                <button>Диффер текста</button>
-                <button>Диффер файла</button>
+                <div class="omdb-stat-toggle">
+                    <button on:click={toggleStatistics}>Статистика</button>
+                    <button on:click={goToUpload}>Сбросить</button>
+                </div>
+                <div class="omdb-main-inputs">
+                    <button on:click={goToDomDiffer}>Диффер вёрстки</button>
+                    <button on:click={goToDomDiffer}>Диффер текста</button>
+                    <button on:click={goToFileDiffer}>Диффер файла</button>
+                </div>
             </div>
         </div>
         <div class="omdb-main-area">
-            <div class="omdb-statistics-wrapper">
+            <div class="omdb-statistics-wrapper" id="stat-menu">
                 <div class="omdb-statistics">
                     <div class="omdb-stat-block omdb-files-name">
     
@@ -84,11 +131,10 @@ let resultHtml;
                 </div>
 
             </div>
-            <div class="omdb-main-view-wrapper">
-                <div class="omdb-main-view">
-
-                </div>
-            </div>
+            
+            {#if mainView == views[currentView]}
+                <svelte:component this={mainView} ></svelte:component>
+            {/if}
         </div>
     </div>
 </workarea>
@@ -108,7 +154,7 @@ let resultHtml;
 
     .omdb-work-area-wrapper {
         min-height: 98%;
-        width: 99%;
+        min-width: 99%;
         background-color: aqua;
     }
 
@@ -126,8 +172,30 @@ let resultHtml;
         width: 99%;
         background-color: greenyellow;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         align-items: center;
+    }
+
+    .omdb-stat-toggle {
+        width: 25%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .omdb-stat-toggle button {
+        margin-left: 20px;
+    }
+
+    .omdb-main-inputs {
+        width: 75%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .omdb-main-inputs button {
+        margin-right: 120px;
     }
 
     .omdb-main-area {
@@ -140,25 +208,11 @@ let resultHtml;
     .omdb-statistics-wrapper {
         min-height: 100%;
         background-color: cadetblue;
-        width: 25%;
+        width: 0%;
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    .omdb-main-view-wrapper {
-        width: 100%;
-        min-height: 100%;
-        background-color: coral;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .omdb-main-view {
-        width: 100%;
-        min-height: 100%;
-        background-color: tomato;
+        transition: 0.3s ease-out;
     }
 
     .omdb-statistics {
