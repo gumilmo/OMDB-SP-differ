@@ -4,12 +4,15 @@ import { Differ } from '../services/differ-services/differ-file.service';
 import { HtmlGeneratorService } from '../services/html-generator.service';
 import { ComparableHtml } from '../models/dom-element.models';
 import { ComparableDocument, Line } from '../models/file-differ.models';
+import { ComparableFile } from '../models/file-differ.models';
 
 
 export class MainAppController {
 
     public compareDOM (req: any, res: any) {
-    
+        
+        const timeAppStart = new Date().getTime();
+
         var files =  req.body;
         var src = files.src;
         var dest = files.dest;
@@ -22,20 +25,30 @@ export class MainAppController {
     
         const differDomService = new DifferDomSerivce(SourceBody, DestBody);
 
-        let styles = destFileJSdom.window.document.querySelector('html')?.innerHTML;
-        styles = styles?.substring(styles.indexOf("<head>")+6, styles.lastIndexOf("</head>"));
+        let styles;
+
+        if (req.isStyleContains) {
+            styles = destFileJSdom.window.document.querySelector('html')?.innerHTML;
+            styles = styles?.substring(styles.indexOf("<head>")+6, styles.lastIndexOf("</head>"));
+        }
+        else {
+            styles = "";
+        }
         
         const mainContent = differDomService.DOMHandler();
 
-        const result = new ComparableHtml(styles, mainContent);
+        const timeAppEnd = new Date().getTime();
+
+        const result = new ComparableHtml(styles, mainContent, timeAppStart-timeAppEnd);
 
         res.send(result);
     };
     
     public compareText (req: any, res: any) {
     
+        const timeAppStart = new Date().getTime();
+
         var files =  req.body;
-     
         var src = files.src;
         var dest = files.dest;
         
@@ -49,9 +62,12 @@ export class MainAppController {
          
         const differ = new Differ(source, destination);
      
-        var lines = differ.getViewableLines();
-        var timeAppEnd = new Date().getTime();
+        const lines = differ.getViewableLines();
+
+        const timeAppEnd = new Date().getTime();
+
+        const result = new ComparableFile(lines, timeAppStart-timeAppEnd);
      
-        res.send(lines);
+        res.send(result);
      };
 }

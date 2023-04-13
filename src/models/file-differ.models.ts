@@ -62,3 +62,17 @@ export class ComparableDocument {
 
     Lines: Line[];
 }
+
+export class ComparableFile {
+
+    constructor (viewableLines: ViewableLine[], time: number) {
+        this.ViewableLines = viewableLines;
+        this.Time = time;
+    }
+
+    Time: number;
+    Added: number;
+    Deleted: number;
+    Unchanged: number;
+    ViewableLines: ViewableLine[];
+}

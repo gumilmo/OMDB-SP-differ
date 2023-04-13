@@ -1,14 +1,16 @@
 <script>
     import { fade } from 'svelte/transition';
+    import { writable } from "svelte/store";
 
-    export let sourceFile = [];
-    export let destFile = [];
+    export let sourceFile = writable([]);
+    export let destFile = writable([]);
+
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="omdb-main-upload-files-wrapper">
     <div class="omdb-main-upload-files" id="main-view">
-        <div class="omdb-upload-file-wrapper">
+        <div class="omdb-upload-file-wrapper" >
             <label class="input-file">
                 <input type="file" name="file" bind:files={sourceFile} >		
                 <!-- svelte-ignore a11y-missing-attribute -->

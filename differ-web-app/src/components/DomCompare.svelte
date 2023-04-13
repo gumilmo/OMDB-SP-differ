@@ -2,6 +2,11 @@
     import { fade } from 'svelte/transition';
     import UploadFiles from './UploadFiles.svelte';
 
+    let sourceFile = null;
+    let destFile = null;
+
+    export let result = null;
+
     function makeMobile() {
         document.getElementById("main-view").style.width = "580px";
     }

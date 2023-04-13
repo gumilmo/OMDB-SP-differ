@@ -1,5 +1,7 @@
 <script>
     import { fade } from 'svelte/transition';
+
+    export let result;
 </script>
 
 <div class="omdb-main-view-wrapper">

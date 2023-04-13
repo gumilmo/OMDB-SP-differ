@@ -3,6 +3,9 @@
     import DomCompare from "./DomCompare.svelte";
     import FileCompare from "./FileCompare.svelte";
 
+
+    //import { sourceFile } from "./UploadFiles.svelte";
+
     const views = [UploadFiles, DomCompare, FileCompare];
 
     let mainView = null;
@@ -14,6 +17,8 @@
 
     function goToUpload() {
         currentView = 0
+        sourceFile = null;
+        destFile = null;
         updateMainView()
     }
 
@@ -29,9 +34,14 @@
 
     updateMainView()
 
+    let sourceFile = null;
+    let destFile = null;
 
-    let resultHtml;
-    let isTextComare = false;
+    let sourceFileText = null;
+    let destFileText = null;
+    let isStyleContains = false;
+
+    let result;
 
     async function castHtmlFileToTextPlain(file) {
         const reader = new FileReader()
@@ -45,26 +55,54 @@
         return await Promise.resolve(promise);
     }
 
-    const handleSubmit = async e => {
-        let ACTION_URL = e.target.action;
-        if (isTextComare) {
-            ACTION_URL += "-text"
+    //отсылает json с текстом из двух файлов и полем если должен содержаться стиль. Если стиль должен быть конкотинируем поля стиля и боди и вставляем как innerhtml
+    //иначе только боди как  innerhtml
+    async function compareFilesRequest(addres) {
+        const res = await fetch(addres, {
+            method: 'POST',
+            body: JSON.stringify({
+                sourceFileText,
+                destFileText,
+                isStyleContains
+            })
+        });
+
+        const jsonResult = await res.json();
+        result = json;
+    }
+
+
+    //преобразовать файлы в плэинтекст
+    function comapreDomWithStyles(isWithStyle) {
+        if (sourceFile === null && destFile === null) {
+            return;
         }
-        const filesData = e.currentTarget;
-        const formData = new FormData(filesData);
-        
-        const data = new URLSearchParams()
-		for (let field of formData) {
-			const [key, value] = field;
-			data.append(key, await castHtmlFileToTextPlain(value));
-		};
+        else {
+            
+            sourceFileText = castHtmlFileToTextPlain(sourceFile[0]);
+            destFileText = castHtmlFileToTextPlain(destFile[0]);
+            isStyleContains = isWithStyle;
 
-        const response = await fetch(ACTION_URL, {
-				method: 'POST',
-				body: data
-		});
+            goToDomDiffer()
 
-        resultHtml = await response.text();
+            compareFilesRequest('http://localhost:80/api/compare');
+        }
+    }
+
+    function comapreFiles() {
+        if (sourceFile === null && destFile === null) {
+            return;
+        }
+        else {
+            
+            sourceFileText = castHtmlFileToTextPlain(sourceFile[0]);
+            destFileText = castHtmlFileToTextPlain(destFile[0]);
+            isStyleContains = isWithStyle;
+
+            goToFileDiffer()
+
+            compareFilesRequest('http://localhost:80/api/compare-text');
+        }
     }
 
     function toggleStatistics() {
@@ -104,8 +142,8 @@
                     <button on:click={goToUpload}>Сбросить</button>
                 </div>
                 <div class="omdb-main-inputs">
-                    <button on:click={goToDomDiffer}>Диффер вёрстки</button>
-                    <button on:click={goToDomDiffer}>Диффер текста</button>
+                    <button on:click={comapreDomWithStyles(true)}>Диффер вёрстки</button>
+                    <button on:click={comapreDomWithStyles(false)}>Диффер текста</button>
                     <button on:click={goToFileDiffer}>Диффер файла</button>
                 </div>
             </div>
@@ -132,8 +170,15 @@
 
             </div>
             
-            {#if mainView == views[currentView]}
+            <!-- {#if mainView == views[currentView]}
                 <svelte:component this={mainView} ></svelte:component>
+            {/if} -->
+            {#if currentView == 0}
+            <UploadFiles bind:sourceFile bind:destFile></UploadFiles>
+            {:else if currentView == 1}
+            <DomCompare bind:result></DomCompare>
+            {:else}
+            <FileCompare bind:result></FileCompare>
             {/if}
         </div>
     </div>
