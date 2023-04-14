@@ -35,7 +35,7 @@
     .omdb-main-upload-files-wrapper {
         width: 100%;
         min-height: 100%;
-        background-color: rgb(80, 150, 255);
+        /*background-color: rgb(80, 150, 255);*/
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -45,7 +45,8 @@
     .omdb-main-upload-files {
         width: 100%;
         min-height: 100%;
-        background-color: rgb(71, 255, 163);
+        /*background-color: rgb(71, 255, 163);*/
+        border: 1px solid #DBDBDB;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -62,7 +63,10 @@
         flex-flow: column;
         margin-left: 20px;
         margin-right: 20px;
-        border: 2px solid black;
+        color: white;
+        background-color: #0F62FE;
+        border-radius: 5px;
+        box-shadow: 0px 4px 14px -2px rgba(0, 0, 0, 0.67);
     }
 
     .input-file input[type=file] {

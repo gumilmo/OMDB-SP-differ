@@ -36,6 +36,7 @@
 
     let sourceFile = null;
     let destFile = null;
+    let isWithStyle = false;
 
     let sourceFileText = null;
     let destFileText = null;
@@ -138,13 +139,23 @@
         <div class="omdb-buttons-area-wrapper">
             <div class="omd-button-area">
                 <div class="omdb-stat-toggle">
-                    <button on:click={toggleStatistics}>Статистика</button>
-                    <button on:click={goToUpload}>Сбросить</button>
+                    <button on:click={toggleStatistics}>
+                        <img class="file-icon" src="./static/menu.svg"/>
+                    </button>
+                    <button on:click={goToUpload}>
+                        <img class="file-icon" src="./static/reload.svg"/>
+                    </button>
                 </div>
                 <div class="omdb-main-inputs">
-                    <button on:click={comapreDomWithStyles(true)}>Диффер вёрстки</button>
-                    <button on:click={comapreDomWithStyles(false)}>Диффер текста</button>
-                    <button on:click={comapreFiles}>Диффер файла</button>
+                    <button on:click={comapreDomWithStyles(true)}>
+                        <img class="file-icon" src="./static/compare-dom.svg" />
+                    </button>
+                    <button on:click={comapreDomWithStyles(false)}>
+                        <img class="file-icon" src="./static/compare-no-styles.svg"/>
+                    </button>
+                    <button on:click={comapreFiles}>
+                        <img class="file-icon" src="./static/code.svg" />
+                    </button>
                 </div>
             </div>
         </div>
@@ -186,7 +197,7 @@
 
 <style>
     workarea {
-        background-color: bisque;
+        /*background-color: bisque;*/
         min-height: 100%;
         width: 100%;
         padding-top: 10px;
@@ -200,25 +211,44 @@
     .omdb-work-area-wrapper {
         min-height: 98%;
         min-width: 99%;
-        background-color: aqua;
+        /*background-color: aqua;*/
     }
 
     .omdb-buttons-area-wrapper {
         width: 100%;
-        height: 110px;
-        background-color: black;
+        height: 80px;
+        box-shadow: 0px 0px 3px 0px rgba(34, 60, 80, 0.6);
         display: flex;
         align-items: center;
         justify-content: center;
+        border-radius: 5px 5px 0px 0px;
+        background-color: #0F62FE;
     }
 
     .omd-button-area {
         height: 90%;
         width: 99%;
-        background-color: greenyellow;
+        /*background-color: greenyellow;*/
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .omd-button-area button {
+        width: 40px;
+        height: 40px;
+        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        border: 1px solid #0F62FE;
+        border-radius: 5px;
+    }
+
+    .omd-button-area button img {
+        height: 25px;
+        width: 25px;
     }
 
     .omdb-stat-toggle {
@@ -246,7 +276,7 @@
     .omdb-main-area {
         min-height: 900px;
         width: 100%;
-        background-color: rgb(255, 54, 148);
+        /*background-color: rgb(255, 54, 148);*/
         display: flex;
     }
 
